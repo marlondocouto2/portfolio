@@ -199,5 +199,8 @@ tr.best td { background: var(--accent-soft); font-weight: 600; }
 @media (max-width: 640px) {
   .site-header .wrap { flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 6px; row-gap: 4px; }
   .nav { order: 3; width: 100%; margin: 0 -6px; }
-  .nav a { padding: 6px 7px; }
+  .nav a { padding: 6px 6px; font-size: 0.85rem; }
 }
+
+/* Let grid columns shrink below their content (wide tables scroll inside their own box instead). */
+.grid-2 > * { min-width: 0; }
