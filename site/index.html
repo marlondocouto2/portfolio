@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marlon Do Couto · Forecasting portfolio</title>
+  <meta name="description" content="Forecasting projects built from scratch on synthetic and public data, with interactive results.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/common.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Marlon Do Couto</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./" aria-current="page">Home</a>
+        <a href="weekday-seasonal.html">Weekday-seasonal</a>
+        <a href="cash-flow.html">Cash-flow</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Forecasting portfolio</div>
+      <h1>Forecasts you can explain, measured in dollars</h1>
+      <!-- Edit this paragraph to introduce yourself. -->
+      <p class="lead">
+        A series of treasury forecasting projects, each built from scratch on synthetic and public data.
+        Every project starts simple, adds one fix at a time, and measures what each step is worth
+        with a walk-forward backtest and a dollar metric.
+      </p>
+      <div class="links">
+        <a class="button primary" href="cash-flow.html">See the latest project</a>
+        <a class="button" href="https://github.com/marlondocouto2">GitHub</a>
+      </div>
+    </section>
+
+    <h2>Projects</h2>
+    <div class="cards">
+      <a class="card" href="weekday-seasonal.html">
+        <span class="tag">Project 1 · Seasonal baseline</span>
+        <h3>Weekday-seasonal forecaster</h3>
+        <p>Daily payment volume, 1–30 days ahead, with one explainable formula: recent level × weekday effect × payday effect.</p>
+        <div class="metric">−35% error<small>vs repeating last week · buffer $15.8M vs $26.5M a day</small></div>
+      </a>
+      <a class="card" href="cash-flow.html">
+        <span class="tag">Project 2 · Spikes and holidays</span>
+        <h3>Cash-flow forecaster</h3>
+        <p>Builds on Project 1 in five steps: spike detection, holiday effects and Fourier seasonality with Prophet, across three corridors.</p>
+        <div class="metric">−38% error<small>vs the Project 1 baseline · $10.5M less cash held a day</small></div>
+      </a>
+      <div class="card muted">
+        <span class="tag">Project 3 · In progress</span>
+        <h3>FX margin forecaster</h3>
+        <p>A two-stage model for FX margin and margin at risk: trend first, then gradient boosting on what the trend misses.</p>
+      </div>
+    </div>
+
+    <h2>How each project is built</h2>
+    <ol class="steps prose">
+      <li><strong>Simulate data with known structure</strong>, so each model component can be checked against the truth, and run the same pipeline on public U.S. Treasury data.</li>
+      <li><strong>Start from a simple, explainable model</strong> and compare it with naive baselines.</li>
+      <li><strong>Add one fix at a time</strong>, each aimed at a specific kind of day the previous version gets wrong.</li>
+      <li><strong>Measure with a walk-forward backtest</strong>: refit at every origin, never use data from the future, and report errors by type of day.</li>
+      <li><strong>Translate into dollars</strong>: the cash buffer needed to cover shortfalls, and the cost of idle cash.</li>
+    </ol>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">All data on this site is simulated unless marked as U.S. Treasury data. Code for every project is on <a href="https://github.com/marlondocouto2">GitHub</a>.</div>
+  </footer>
+</body>
+</html>
