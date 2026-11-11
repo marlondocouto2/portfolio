@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cash-flow forecaster · Marlon Do Couto</title>
+  <meta name="description" content="Five model versions, from a seasonal baseline to Prophet with Fourier seasonality and a Gaussian mixture for spikes. Interactive backtest results.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/common.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+  <script defer src="assets/cashflow.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Marlon Do Couto</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="weekday-seasonal.html">Weekday-seasonal</a>
+        <a href="cash-flow.html" aria-current="page">Cash-flow</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Project 2 · Spikes and holidays</div>
+      <h1>Cash-flow forecaster</h1>
+      <p class="lead">
+        A money-transfer business pre-funds each payout corridor every morning. This project takes the
+        <a href="weekday-seasonal.html">Project 1 seasonal model</a> and fixes the three kinds of day that
+        break it: <strong>random spikes</strong>, <strong>scheduled spikes</strong> (a payroll run every other
+        Friday) and <strong>holidays</strong> in the receiving country. One fix at a time, five versions,
+        each measured on the same backtest.
+      </p>
+      <div class="links">
+        <a class="button" href="https://github.com/marlondocouto2/cash-flow-forecaster">Code on GitHub</a>
+        <a class="button" href="https://github.com/marlondocouto2/cash-flow-forecaster/blob/main/METHODOLOGY.md">Methodology</a>
+        <a class="button" href="https://github.com/marlondocouto2/cash-flow-forecaster/blob/main/notebooks/walkthrough.ipynb">Notebook</a>
+      </div>
+    </section>
+
+    <div class="kpis" id="kpis"></div>
+
+    <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
+
+    <div class="controls">
+      <div><span class="control-label">Horizon</span><span id="horizon"></span></div>
+    </div>
+
+    <section class="panel">
+      <h3>What each version adds</h3>
+      <p class="sub" id="steps-sub">Average error per corridor-day. Each bar shows the change from the previous version.</p>
+      <div id="steps" class="chart" role="img" aria-label="MAE of each model version"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Which days each fix helps</h3>
+      <p class="sub">Average error by type of day. Each step improves its own target; random spikes stay unpredictable for every version.</p>
+      <div id="daytype" class="chart" role="img" aria-label="MAE by type of day and model version"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Explore the forecasts</h3>
+      <p class="sub">A year of walk-forward forecasts (2025) for one corridor. Pick a corridor and versions, or jump to a holiday.</p>
+      <div class="controls">
+        <div><span class="control-label">Corridor</span>
+          <select id="corridor" aria-label="Corridor">
+            <option value="MX">U.S. → Mexico</option>
+            <option value="PH">U.S. → Philippines</option>
+            <option value="IN">U.S. → India</option>
+          </select>
+        </div>
+        <div><span class="control-label">Jump to</span><span id="presets"></span></div>
+      </div>
+      <div class="controls"><div><span class="control-label">Versions</span><span id="versions"></span></div></div>
+      <div id="explorer" class="chart tall" role="img" aria-label="Actual daily volume vs selected versions' forecasts"></div>
+      <div class="legend-note">
+        <span><span class="swatch" style="background:var(--shade-window)"></span>Days around a holiday (surge before, catch-up after)</span>
+        <span><span class="swatch" style="background:var(--shade-day)"></span>Holiday (volume drops)</span>
+        <span><span class="ring"></span>Random spike (not forecastable)</span>
+        <span><span class="swatch" id="payroll-swatch"></span>Payroll Friday</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Results table</h3>
+      <p class="sub" id="table-sub"></p>
+      <div class="table-wrap"><table id="table"></table></div>
+    </section>
+
+    <section class="prose">
+      <h2>The five versions</h2>
+      <ol class="steps">
+        <li><strong>Baseline</strong>: the Project 1 model, recent level × weekday factor × payday factor.</li>
+        <li><strong>+ Spike GMM</strong>: a Gaussian mixture flags random spikes in the residuals; the baseline is refitted without them, so they stop inflating every ordinary day.</li>
+        <li><strong>+ Holidays</strong>: holidays are cleaned out too, then each holiday's effect is learned from past years (surge before, drop on the day, catch-up after) and multiplied back in.</li>
+        <li><strong>Prophet + Fourier</strong>: a different family. Fourier seasonalities (weekly, every 14 days, monthly, yearly) treat repeating spikes like the payroll run as seasonality, so they get forecast.</li>
+        <li><strong>Prophet + Fourier + GMM</strong>: the mixture runs on Prophet's residuals, so it removes only the spikes the seasonality can't explain. Predictable patterns go into the forecast; random spikes stay out.</li>
+      </ol>
+      <p>Data: three simulated corridors with known weekday, payday, holiday and spike effects. The same pipeline also runs on public U.S. Treasury data, where the Fourier approach is the one that helps. The full method with formulas is in the <a href="https://github.com/marlondocouto2/cash-flow-forecaster/blob/main/METHODOLOGY.md">methodology</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Simulated data. Results exported from the project's backtest by <code>scripts/export_data.py</code>. <a href="./">Back to all projects</a></div>
+  </footer>
+</body>
+</html>
