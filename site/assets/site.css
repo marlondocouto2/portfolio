@@ -176,3 +176,28 @@ tr.best td { background: var(--accent-soft); font-weight: 600; }
 .site-footer { border-top: 1px solid var(--line); margin-top: 64px; padding: 24px 0 40px; color: var(--ink-3); font-size: 0.88rem; }
 .site-footer a { color: var(--ink-2); }
 .noscript { background: var(--surface-2); padding: 12px; border-radius: 8px; }
+
+/* About page */
+.about-hero { display: grid; gap: 24px; align-items: center; padding: 48px 0 8px; }
+@media (min-width: 720px) { .about-hero { grid-template-columns: 220px 1fr; gap: 40px; } }
+.portrait {
+  width: 180px; height: 180px; border-radius: 50%; object-fit: cover; display: block;
+  border: 4px solid var(--surface); box-shadow: 0 0 0 1px var(--line);
+}
+@media (min-width: 720px) { .portrait { width: 220px; height: 220px; } }
+.cards.compact { margin: 16px 0 8px; grid-template-columns: 1fr; }
+@media (min-width: 600px) { .cards.compact { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .cards.compact { grid-template-columns: repeat(4, 1fr); } }
+.cards.compact .card { gap: 6px; }
+.gallery { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px; }
+@media (min-width: 600px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
+.gallery figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.gallery img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.gallery figcaption { padding: 10px 14px; font-size: 0.9rem; color: var(--ink-2); }
+
+/* Small screens: name and theme button on top, menu on its own row underneath */
+@media (max-width: 640px) {
+  .site-header .wrap { flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 6px; row-gap: 4px; }
+  .nav { order: 3; width: 100%; margin: 0 -6px; }
+  .nav a { padding: 6px 7px; }
+}
