@@ -46,6 +46,7 @@
     aqua: ["#1baf7a", "#199e70"],
     yellow: ["#eda100", "#c98500"],
     violet: ["#6250d6", "#9085e9"],
+    gray: ["#8a8984", "#8f8e86"],
   };
   const MODEL_HUE = {
     SeasonalWeekday: "blue",
@@ -56,6 +57,11 @@
     "3. + Holidays": "blue",
     "4. Prophet + Fourier": "yellow",
     "5. Prophet + Fourier + GMM": "violet",
+    "Stage 1: moving average": "gray",
+    "Stage 1: EWMA": "orange",
+    "+ Ridge": "aqua",
+    "+ XGBoost": "blue",
+    "+ LightGBM": "violet",
   };
   function color(model) {
     const hue = HUES[MODEL_HUE[model]] || ["#8a8984", "#8f8e86"];
@@ -160,7 +166,8 @@
     });
     if (!isFinite(lo)) return null;
     const pad = (hi - lo) * 0.08 || 1;
-    return [Math.max(0, lo - pad), hi + pad];
+    // Don't dip below zero for series that never go negative (volumes); allow it when they do (margins).
+    return [lo >= 0 ? Math.max(0, lo - pad) : lo - pad, hi + pad];
   }
 
   function autoscaleY(el, xRange) {

@@ -117,6 +117,41 @@ def export_cashflow(repo: Path) -> dict:
     }
 
 
+def export_fx(repo: Path) -> dict:
+    """Project 3: margin rate (bps) per corridor and horizon, model forecasts and the risk band."""
+    rows = _read_csv(repo / "reports" / "backtest_forecasts.csv.gz")
+    bps = lambda v: None if v in ("", "nan") else round(float(v) * 1e4, 2)  # noqa: E731
+    models = {"stage1_sma": "Stage 1: moving average", "stage1_ewma": "Stage 1: EWMA",
+              "plus_ridge": "+ Ridge", "plus_xgboost": "+ XGBoost", "plus_lightgbm": "+ LightGBM"}
+    series = {}
+    for corridor in ("MX", "IN", "BR"):
+        series[corridor] = {}
+        for h in ("1", "5"):
+            sub = sorted((r for r in rows if r["corridor"] == corridor and r["horizon"] == h),
+                         key=lambda r: r["target"])
+            series[corridor][h] = {
+                "dates": [r["target"] for r in sub],
+                "actual": [bps(r["margin_rate"]) for r in sub],
+                "band": [bps(r["mar_band"]) for r in sub],
+                "forecasts": {name: [bps(r[col]) for r in sub] for col, name in models.items()},
+            }
+    results = [
+        {"model": r["model"].split(". ", 1)[-1] if r["model"][0].isdigit() else "Oracle",
+         "horizon": int(r["horizon"]), "MAE_bps": _num(r["MAE_bps"], 2), "RMSE_bps": _num(r["RMSE_bps"], 2),
+         "MAE_usd": _num(r["MAE_usd"], 0),
+         "captured": _num(r["share_of_predictable_error_captured"], 3)}
+        for r in _read_csv(repo / "reports" / "results.csv")
+    ]
+    risk = [{"horizon": int(r["horizon"]), "corridor": r["corridor"], "breach_rate": _num(r["breach_rate"], 4),
+             "avg_shortfall_usd": _num(r["avg_shortfall_usd"], 0), "avg_band_bps": _num(r["avg_band_bps"], 1)}
+            for r in _read_csv(repo / "reports" / "risk.csv")]
+    shap = [{"feature": r[""] if "" in r else list(r.values())[0], "mean_abs_shap_bps": round(float(r["mean_abs_shap"]) * 1e4, 3)}
+            for r in _read_csv(repo / "reports" / "shap_importance.csv")]
+    return {"title": "Two-stage FX margin forecaster",
+            "repo": "https://github.com/marlondocouto2/fx-margin-forecaster",
+            "models": list(models.values()), "series": series, "results": results, "risk": risk, "shap": shap}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -127,6 +162,7 @@ def main() -> None:
     exports = {
         "weekday.json": export_weekday(args.projects_dir / "weekday-seasonal-forecaster"),
         "cashflow.json": export_cashflow(args.projects_dir / "cash-flow-forecaster"),
+        "fxmargin.json": export_fx(args.projects_dir / "fx-margin-forecaster"),
     }
     for name, data in exports.items():
         path = OUT / name

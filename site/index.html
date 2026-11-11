@@ -16,8 +16,9 @@
       <nav class="nav" aria-label="Main">
         <a href="./" aria-current="page">Home</a>
         <a href="about.html">About</a>
-        <a href="weekday-seasonal.html">Weekday-seasonal</a>
+        <a href="weekday-seasonal.html">Weekday</a>
         <a href="cash-flow.html">Cash-flow</a>
+        <a href="fx-margin.html">FX margin</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -53,10 +54,16 @@
         <p>Builds on Project 1 in five steps: spike detection, holiday effects and Fourier seasonality with Prophet, across three corridors.</p>
         <div class="metric">−38% error<small>vs the Project 1 baseline · $10.5M less cash held a day</small></div>
       </a>
-      <div class="card muted">
-        <span class="tag">Project 3 · In progress</span>
+      <a class="card" href="fx-margin.html">
+        <span class="tag">Project 3 · FX margin and margin at risk</span>
         <h3>FX margin forecaster</h3>
-        <p>A two-stage model for FX margin and margin at risk: trend first, then gradient boosting on what the trend misses.</p>
+        <p>Real FX rates, two stages: an EWMA trend, then XGBoost and LightGBM on what the trend misses, with a calibrated 5% margin-at-risk band.</p>
+        <div class="metric">83% of predictable error<small>captured by stage 2 · risk band breached on 5.6% of days</small></div>
+      </a>
+      <div class="card muted">
+        <span class="tag">Project 4 · In progress</span>
+        <h3>AI treasury analyst</h3>
+        <p>A daily brief for treasury leadership: numbers computed in code, commentary written by an LLM, every claim checked before it's sent.</p>
       </div>
     </div>
 

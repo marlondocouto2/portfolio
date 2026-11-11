@@ -18,8 +18,9 @@
       <nav class="nav" aria-label="Main">
         <a href="./">Home</a>
         <a href="about.html">About</a>
-        <a href="weekday-seasonal.html" aria-current="page">Weekday-seasonal</a>
+        <a href="weekday-seasonal.html" aria-current="page">Weekday</a>
         <a href="cash-flow.html">Cash-flow</a>
+        <a href="fx-margin.html">FX margin</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -64,10 +65,34 @@
       </section>
       <section class="panel">
         <h3>Required cash buffer</h3>
-        <p class="sub">Extra cash held on top of the forecast to cover shortfalls on 95% of days.</p>
+        <p class="sub">Extra cash held on top of the forecast to cover shortfalls on 95% of days. Lower is better; see the explanation below.</p>
         <div id="buffer" class="chart short" role="img" aria-label="Required buffer by model and horizon"></div>
       </section>
     </div>
+
+    <section class="panel">
+      <h3>What is the required buffer?</h3>
+      <p class="sub">The dollar metric of this project: how much extra cash treasury has to hold so a forecast miss doesn't leave it short.</p>
+      <div class="prose" style="max-width:none">
+        <ol>
+          <li><strong>Shortfall.</strong> Each day, if actual payments come in <em>higher</em> than the forecast, the gap is a shortfall: cash that wasn't funded in advance and has to be found on the day, usually at a cost. If payments come in lower, the shortfall is zero (that money sits idle instead).</li>
+          <li><strong>Collect a year of them.</strong> The backtest gives 365 daily shortfalls per model.</li>
+          <li><strong>Take the 95th percentile.</strong> The buffer is the amount that covers the shortfall on 95 days out of 100. Fund "forecast + buffer" every morning and you're short on only about 1 day in 20.</li>
+        </ol>
+        <p>A model with smaller, steadier errors needs a smaller buffer for the same protection. Seven days ahead:</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Model</th><th>Required buffer</th><th>Extra cash vs the seasonal model</th></tr></thead>
+          <tbody>
+            <tr class="best"><td>SeasonalWeekday</td><td>$15.8M a day</td><td>–</td></tr>
+            <tr><td>NaiveWeekly (same day last week)</td><td>$26.5M a day</td><td>+$10.7M a day</td></tr>
+            <tr><td>MovingAverage (28-day mean)</td><td>$33.8M a day</td><td>+$18.0M a day</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin-top:12px">Holding $10.7M less every day than the naive rule, for the same 95% protection, is worth roughly $535k a year at an illustrative 5% annual cost of capital. Daily volumes here average about $97M.</p>
+    </section>
 
     <section class="panel">
       <h3>Where each model goes wrong</h3>

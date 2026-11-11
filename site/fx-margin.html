@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FX margin forecaster · Marlon Do Couto</title>
+  <meta name="description" content="Two-stage FX margin forecaster: an EWMA trend, then gradient boosting on what the trend misses, with a calibrated margin-at-risk band. Real FX data, interactive results.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/common.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+  <script defer src="assets/fxmargin.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Marlon Do Couto</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="about.html">About</a>
+        <a href="weekday-seasonal.html">Weekday</a>
+        <a href="cash-flow.html">Cash-flow</a>
+        <a href="fx-margin.html" aria-current="page">FX margin</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Project 3 · FX margin and margin at risk</div>
+      <h1>Two-stage FX margin forecaster</h1>
+      <p class="lead">
+        A money-transfer business quotes each customer yesterday's exchange rate minus a markup, then
+        buys the currency a day or two later at whatever the rate is by then. If the currency moves
+        against it in between, the margin shrinks or turns negative. This project forecasts each
+        corridor's daily margin and its <strong>margin at risk</strong>: a trend first, then machine
+        learning on what the trend misses.
+      </p>
+      <div class="links">
+        <a class="button" href="https://github.com/marlondocouto2/fx-margin-forecaster">Code on GitHub</a>
+        <a class="button" href="https://github.com/marlondocouto2/fx-margin-forecaster/blob/main/METHODOLOGY.md">Methodology</a>
+        <a class="button" href="https://github.com/marlondocouto2/fx-margin-forecaster/blob/main/notebooks/walkthrough.ipynb">Notebook</a>
+      </div>
+    </section>
+
+    <div class="kpis" id="kpis"></div>
+
+    <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
+
+    <div class="controls">
+      <div><span class="control-label">Horizon</span><span id="horizon"></span></div>
+    </div>
+
+    <section class="panel">
+      <h3>What each model adds</h3>
+      <p class="sub" id="ladder-sub"></p>
+      <div id="ladder" class="chart" role="img" aria-label="Margin-rate error by model, with the oracle floor"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Explore the forecasts and the risk band</h3>
+      <p class="sub">Two years of walk-forward forecasts on real FX rates. The shaded band runs from the forecast down to the 5% margin-at-risk level: realized margin should fall below it on about 1 day in 20.</p>
+      <div class="controls">
+        <div><span class="control-label">Corridor</span>
+          <select id="corridor" aria-label="Corridor">
+            <option value="MX">U.S. → Mexico (MXN)</option>
+            <option value="IN">U.S. → India (INR)</option>
+            <option value="BR">U.S. → Brazil (BRL)</option>
+          </select>
+        </div>
+        <div><span class="control-label">Jump to</span><span id="presets"></span></div>
+      </div>
+      <div class="controls"><div><span class="control-label">Models</span><span id="models"></span></div></div>
+      <div id="explorer" class="chart tall" role="img" aria-label="Realized margin, forecasts and the 5% risk band"></div>
+      <div class="legend-note">
+        <span><span class="swatch" id="band-swatch"></span>Between the forecast (+ XGBoost) and the 5% margin-at-risk level</span>
+        <span><span class="ring"></span>Day the realized margin fell below the band</span>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="panel">
+        <h3>Margin at risk: is the band honest?</h3>
+        <p class="sub" id="risk-sub"></p>
+        <div class="table-wrap"><table id="risk"></table></div>
+      </section>
+      <section class="panel">
+        <h3>What drives the correction</h3>
+        <p class="sub">Average size of each input's push on stage 2's correction (SHAP, XGBoost), in basis points.</p>
+        <div id="shap" class="chart short" role="img" aria-label="Average SHAP contribution by input"></div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h3>Results table</h3>
+      <p class="sub" id="table-sub"></p>
+      <div class="table-wrap"><table id="table"></table></div>
+    </section>
+
+    <section class="prose">
+      <h2>What the results show</h2>
+      <ul>
+        <li><strong>Most of the error can't be forecast.</strong> About 53 of 57 basis points is the currency's move during settlement. FX rates behave close to a random walk, so the "oracle" line, which knows the markup but not the FX move, is the floor no model can beat.</li>
+        <li><strong>Stage 2 captures most of what can be.</strong> The trend only sees margins at least 4 days old, so it lags; the business already knows today's markup. Bringing the trend up to date with that is most of what stage 2 does.</li>
+        <li><strong>The value is in risk as much as accuracy.</strong> A calibrated 5% band tells treasury how much margin could be lost on a bad day, per corridor. Brazil, the most volatile currency, gets the widest band.</li>
+      </ul>
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li><strong>Real FX rates from FRED</strong> (peso, rupee, real and the dollar index, 2016–2026), with a simulated business on top: a markup that widens in volatile markets, and settlement one or two business days later.</li>
+        <li><strong>Stage 1: an EWMA trend</strong> of margins that have certainly settled, with a 28-day moving average for comparison.</li>
+        <li><strong>Stage 2: Ridge, XGBoost and LightGBM</strong> learn stage 1's error from FX moves, volatility, the dollar index, today's markup and the calendar. Tuned with Optuna on time-ordered cross-validation.</li>
+        <li><strong>Margin at risk:</strong> LightGBM quantile regression for the 5th percentile, with a conformal correction checked on the last 180 days of training data.</li>
+        <li><strong>Walk-forward test</strong> over two years, refitting every 30 days on settled data only, with SHAP to explain the corrections.</li>
+      </ol>
+      <p>The full method with formulas is in the <a href="https://github.com/marlondocouto2/fx-margin-forecaster/blob/main/METHODOLOGY.md">methodology</a>. Volumes come from the <a href="cash-flow.html">Project 2</a> generator.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">FX rates are real (FRED); the business layer is simulated. Results exported from the project's backtest by <code>scripts/export_data.py</code>. <a href="./">Back to all projects</a></div>
+  </footer>
+</body>
+</html>
