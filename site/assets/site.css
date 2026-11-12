@@ -162,7 +162,7 @@ th { color: var(--ink-2); font-weight: 600; font-size: 0.82rem; }
 tr.best td { background: var(--accent-soft); font-weight: 600; }
 
 /* Prose */
-.prose { max-width: 760px; }
+.prose { max-width: none; }  /* text runs the full page width, like the About page */
 .prose ul, .prose ol { padding-left: 1.2em; }
 .prose li { margin: 0.3em 0; }
 .steps { counter-reset: step; list-style: none; padding: 0; display: grid; gap: 10px; }
