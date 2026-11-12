@@ -47,7 +47,7 @@
     });
     S.plot("explorer", traces, {
       hovermode: "x unified",
-      xaxis: { range: state.range, rangeslider: { visible: true, thickness: 0.08 }, type: "date" },
+      xaxis: S.dateAxis(data.dates, state.range),
       yaxis: { title: { text: "" } },
       legend: { y: -0.35 },
       margin: { b: 20 },

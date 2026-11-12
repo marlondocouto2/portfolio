@@ -99,7 +99,7 @@
                   marker: { size: 12, color: "rgba(0,0,0,0)", line: { color: S.cssVar("--spike"), width: 2 } } });
     S.plot("explorer", traces, {
       hovermode: "x unified",
-      xaxis: { range: state.range, rangeslider: { visible: true, thickness: 0.08 }, type: "date" },
+      xaxis: S.dateAxis(s.dates, state.range),
       yaxis: { tickprefix: "", ticksuffix: " bps", zeroline: true, zerolinecolor: S.cssVar("--ink-3") },
       legend: { y: -0.35 }, margin: { b: 20 },
     }).then(() => S.autoscaleY("explorer", state.range));
