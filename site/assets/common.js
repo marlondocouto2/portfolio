@@ -151,6 +151,16 @@
     onThemeChange(render);
   }
 
+  // Date axis with a range slider pinned to the data: the slider track runs exactly from the first
+  // to the last day (Plotly would otherwise pad it for the markers), and panning stops at the ends.
+  function dateAxis(dates, range) {
+    const lo = dates[0], hi = dates[dates.length - 1];
+    return {
+      type: "date", range, minallowed: lo, maxallowed: hi,
+      rangeslider: { visible: true, thickness: 0.08, autorange: false, range: [lo, hi] },
+    };
+  }
+
   // Rescale the y-axis to the data inside the visible x-range (initially and while panning
   // or dragging the range slider). Plotly otherwise keeps the y-range of the whole series.
   function fitY(el, xRange) {
@@ -188,7 +198,7 @@
 
   // Bump ASSET_VERSION (and the ?v= on each page's <script>/<link> tags) whenever the site changes,
   // so browsers fetch the new files instead of mixing cached old ones with new ones.
-  const ASSET_VERSION = "2026-11-11c";
+  const ASSET_VERSION = "2026-11-12";
 
   async function loadJSON(path) {
     const res = await fetch(`${path}?v=${ASSET_VERSION}`);
@@ -204,5 +214,5 @@
     console.error(err);
   }
 
-  window.Site = { isDark, onThemeChange, color, cssVar, fmtM, fmtPct, fmtK, layout, plot, autoscaleY, segmented, chips, loadJSON, showError };
+  window.Site = { isDark, onThemeChange, color, cssVar, fmtM, fmtPct, fmtK, layout, plot, dateAxis, autoscaleY, segmented, chips, loadJSON, showError };
 })();

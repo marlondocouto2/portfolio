@@ -124,7 +124,7 @@
 
     S.plot("explorer", traces, {
       hovermode: "x unified", shapes,
-      xaxis: { range: state.range, rangeslider: { visible: true, thickness: 0.08 }, type: "date" },
+      xaxis: S.dateAxis(c.dates, state.range),
       legend: { y: -0.35 }, margin: { b: 20 },
     }).then(() => S.autoscaleY("explorer", state.range));
   }
