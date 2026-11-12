@@ -88,7 +88,7 @@ code { font-family: var(--mono); font-size: 0.9em; background: var(--surface-2);
 /* Hero */
 .hero { padding: 56px 0 24px; }
 .eyebrow { color: var(--ink-3); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.lead { font-size: 1.15rem; color: var(--ink-2); max-width: 720px; }
+.lead { font-size: 1.15rem; color: var(--ink-2); }
 .links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
 .button {
   display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
@@ -204,3 +204,8 @@ tr.best td { background: var(--accent-soft); font-weight: 600; }
 
 /* Let grid columns shrink below their content (wide tables scroll inside their own box instead). */
 .grid-2 > * { min-width: 0; }
+
+/* Headline tiles: four across on wide screens, 2x2 on medium, stacked on phones (never 3 + 1). */
+.kpis { grid-template-columns: 1fr; }
+@media (min-width: 560px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .kpis { grid-template-columns: repeat(4, 1fr); } }

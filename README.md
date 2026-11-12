@@ -33,6 +33,15 @@ python scripts/export_data.py
 Use `--projects-dir PATH` if the repos live elsewhere. The script uses only the Python standard
 library.
 
+## Publishing changes
+
+Browsers keep a copy of the site's files for a few minutes. Whenever you change anything in
+`site/assets/` or `site/data/`, run this before committing, so visitors get the new files right away:
+
+```bash
+python scripts/bump_version.py
+```
+
 ## Previewing locally
 
 ```bash
