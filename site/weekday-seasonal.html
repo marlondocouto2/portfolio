@@ -6,10 +6,10 @@
   <title>Weekday-seasonal forecaster · Marlon Do Couto</title>
   <meta name="description" content="A small, explainable daily-flow forecaster that beats naive baselines by 35–58%. Interactive backtest results.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-12">
-  <script src="assets/common.js?v=2026-11-12"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-12b">
+  <script src="assets/common.js?v=2026-11-12b"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-  <script defer src="assets/weekday.js?v=2026-11-12"></script>
+  <script defer src="assets/weekday.js?v=2026-11-12b"></script>
 </head>
 <body>
   <header class="site-header">
@@ -73,7 +73,7 @@
     <section class="panel">
       <h3>What is the required buffer?</h3>
       <p class="sub">The dollar metric of this project: how much extra cash treasury has to hold so a forecast miss doesn't leave it short.</p>
-      <div class="prose" style="max-width:none">
+      <div class="prose">
         <ol>
           <li><strong>Shortfall.</strong> Each day, if actual payments come in <em>higher</em> than the forecast, the gap is a shortfall: cash that wasn't funded in advance and has to be found on the day, usually at a cost. If payments come in lower, the shortfall is zero (that money sits idle instead).</li>
           <li><strong>Collect a year of them.</strong> The backtest gives 365 daily shortfalls per model.</li>
