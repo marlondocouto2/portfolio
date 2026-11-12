@@ -1,6 +1,6 @@
 # Portfolio site
 
-Source for my forecasting portfolio: an interactive, static site with one page per project.
+Source for my data science portfolio: an interactive, static site with one page per project.
 Charts are drawn in the browser with [Plotly.js](https://plotly.com/javascript/) from data
 exported out of each project's backtest results.
 
