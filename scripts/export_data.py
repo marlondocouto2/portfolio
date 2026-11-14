@@ -152,6 +152,57 @@ def export_fx(repo: Path) -> dict:
             "models": list(models.values()), "series": series, "results": results, "risk": risk, "shap": shap}
 
 
+def export_pricing(repo: Path) -> dict:
+    """Project 4: an A/B test of FX markups, from design to decision, plus treasury designs."""
+    r = lambda path: _read_csv(repo / "reports" / path)  # noqa: E731
+    pct = lambda v, d=2: None if v in ("", "nan", None) else round(float(v) * 100, d)  # noqa: E731
+    metrics = ("revenue", "profit", "volume", "repeat", "converted")
+    effects = [{"option": x["option"], "segment": x["segment"], **{m: pct(x[m], 1) for m in metrics}}
+               for x in r("true_effects.csv")]
+    readout = [{"method": x["method"], "lift": pct(x["lift"]), "ci_low": pct(x["ci_low"]),
+                "ci_high": pct(x["ci_high"]), "p_value": float(x["p_value"])} for x in r("readout.csv")]
+    first = r("readout.csv")[0]
+    demand = {}
+    for tier in ("small", "large"):
+        rows = [x for x in r("demand_curve.csv") if x["amount_tier"] == tier]
+        demand[tier] = {
+            "markup": [pct(x["markup"]) for x in rows],
+            "fitted_revenue": [_num(x["fitted_revenue"], 3) for x in rows],
+            "fitted_profit": [_num(x["fitted_profit"], 3) for x in rows],
+            "true_revenue": [_num(x["true_revenue"], 3) for x in rows],
+            "true_profit": [_num(x["true_profit"], 3) for x in rows],
+            "tested": [{"markup": pct(x["markup"]), "revenue": _num(x["revenue"], 3)}
+                       for x in r("tested_arms.csv") if x["amount_tier"] == tier],
+        }
+    sb = r("switchback.csv")
+    designs = ("new_then_old", "old_then_new", "daily", "blocks")
+    did_panels = {}
+    for x in r("did_panels.csv"):
+        did_panels.setdefault(x["scenario"], {}).setdefault(x["corridor"], []).append(float(x["revenue"]))
+    for scenario, corridors in did_panels.items():
+        for c, ys in corridors.items():
+            base = sum(ys[:18]) / 18
+            corridors[c] = [round(y / base, 4) for y in ys]
+    return {
+        "title": "FX pricing experiment",
+        "repo": "https://github.com/marlondocouto2/fx-pricing-experiment",
+        "true_lift": pct(first["true_lift"]),
+        "srm_p_value": _num(first["srm_p_value"], 3),
+        "n_per_arm": int(first["n_per_arm_3pct_mde"]),
+        "effects": effects,
+        "readout": readout,
+        "peeking": [{"strategy": x["strategy"], "rate": pct(x["false_positive_rate"], 1)} for x in r("peeking.csv")],
+        "stops": [{"day": int(x["readout_day"]), "z": _num(x["boundary_z"], 2), "share": pct(x["share_stopped"], 1)}
+                  for x in r("sequential_stops.csv")],
+        "demand": demand,
+        "switchback": {"truth": round(sum(float(x["truth"]) for x in sb) / len(sb)),
+                       "estimates": {d: [round(float(x[d])) for x in sb] for d in designs}},
+        "did": {"launch_week": 18, "panels": did_panels,
+                "summary": [{"scenario": x["scenario"], "did": pct(x["did"], 1), "placebo": pct(x["placebo"], 1)}
+                            for x in r("did_summary.csv")]},
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -163,6 +214,7 @@ def main() -> None:
         "weekday.json": export_weekday(args.projects_dir / "weekday-seasonal-forecaster"),
         "cashflow.json": export_cashflow(args.projects_dir / "cash-flow-forecaster"),
         "fxmargin.json": export_fx(args.projects_dir / "fx-margin-forecaster"),
+        "pricing.json": export_pricing(args.projects_dir / "fx-pricing-experiment"),
     }
     for name, data in exports.items():
         path = OUT / name

@@ -9,6 +9,7 @@ exported out of each project's backtest results.
 | [Weekday-seasonal forecaster](site/weekday-seasonal.html) | [weekday-seasonal-forecaster](https://github.com/marlondocouto2/weekday-seasonal-forecaster) |
 | [Cash-flow forecaster](site/cash-flow.html) | [cash-flow-forecaster](https://github.com/marlondocouto2/cash-flow-forecaster) |
 | [FX margin forecaster](site/fx-margin.html) | [fx-margin-forecaster](https://github.com/marlondocouto2/fx-margin-forecaster) |
+| [FX pricing experiment](site/fx-pricing.html) | [fx-pricing-experiment](https://github.com/marlondocouto2/fx-pricing-experiment) |
 
 ## How it fits together
 
@@ -24,7 +25,7 @@ project repos (reports/*.csv)  ->  scripts/export_data.py  ->  site/data/*.json 
 ## Updating the data
 
 The project repos are expected next to this one (`../weekday-seasonal-forecaster`,
-`../cash-flow-forecaster`, `../fx-margin-forecaster`). After re-running a project's pipeline:
+`../cash-flow-forecaster`, `../fx-margin-forecaster`, `../fx-pricing-experiment`). After re-running a project's pipeline:
 
 ```bash
 python scripts/export_data.py
