@@ -52,6 +52,49 @@
     <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
 
     <section class="panel">
+      <h3>Two starting models, four methods</h3>
+      <p class="sub">The project varies two things: how good the model in production is at the start of each week (the "champion"), and who does the weekly review.</p>
+      <div class="table-wrap">
+        <table class="text">
+          <thead><tr><th>Starting champion</th><th>The model in production at the start of each week</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Strong</strong></td><td>Project 3's tuned XGBoost: already very good, so there's little left to improve.</td></tr>
+            <tr><td><strong>Weak</strong></td><td>Project 3's stage 1 only (an EWMA trend with no machine learning): deliberately weaker, so there's real improvement to find.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table class="text">
+          <thead><tr><th>Method</th><th>How it reviews the model each week</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Never retrain</strong></td><td>Always keeps the champion. The reference point.</td></tr>
+            <tr><td><strong>Scripted playbook</strong></td><td>A fixed checklist, the same every week, changing one setting at a time and keeping whatever scores best: (1) try each model family with all features; (2) try 3-, 2- and 1-year training windows; (3) try EWMA half-lives of 5 and 20 days; (4) try weekly instead of monthly refits; (5) tune the result's hyperparameters; (6) if it beats the champion in development, run the promotion test. It never looks at <em>why</em> the champion is struggling.</td></tr>
+            <tr><td><strong>Optuna automation</strong></td><td>Searches all settings at once with an algorithm that learns which combinations look promising, then tunes the winner. Smarter than one-at-a-time, but with no understanding of the data.</td></tr>
+            <tr><td><strong>AI agent</strong></td><td>Reads a diagnosis first (which corridor, which weekday, any bias), then tests targeted ideas and decides which candidate deserves the one promotion test.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:16px 0 8px">Never retrain, the scripted playbook and Optuna are the <strong>baselines</strong>: the non-AI methods the agent is compared against. Every method reviewed both starting champions on the same 16 sampled weeks:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Starting champion</th><th>Never retrain</th><th>Scripted playbook</th><th>Optuna</th><th>AI agent</th></tr></thead>
+          <tbody>
+            <tr><td>Strong (tuned XGBoost)</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+            <tr><td>Weak (EWMA only)</td><td>0.00%</td><td>−1.60%</td><td>−1.48%</td><td><strong>−2.34%</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin-top:8px">Change in error over the following 12 weeks vs never retraining. Lower is better.</p>
+      <div class="prose">
+        <ul>
+          <li><strong>Strong champion:</strong> no method switched, so all four tie. The baselines proposed 24 challengers on these weeks, and 15 of them would have done worse. The agent proposed none.</li>
+          <li><strong>Weak champion:</strong> the agent came out ahead. With the EWMA it spotted a weekday pattern and a bias the EWMA can't capture, and went straight to lean models built on the markup and recent-error features, using about half the backtests of the other two methods.</li>
+          <li><strong>So the agent's possible edge is judgement</strong>: choosing what to test, and which candidate to put forward. It only showed where there was something to find, and on only 4 switches, so it's promising, not proven. Running more weeks costs no money (the agent runs on a Claude plan), only time.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel">
       <h3>Does the AI agent choose better models?</h3>
       <p class="sub" id="tests-sub"></p>
       <div class="controls">
