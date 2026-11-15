@@ -6,8 +6,8 @@
   <title>Marlon Do Couto · Data science portfolio</title>
   <meta name="description" content="Data science projects by Marlon Do Couto, built from scratch on synthetic and public data, with interactive results. Current focus: forecasting.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-14">
-  <script src="assets/common.js?v=2026-11-14"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15">
+  <script src="assets/common.js?v=2026-11-15"></script>
 </head>
 <body>
   <header class="site-header">
@@ -20,6 +20,7 @@
         <a href="cash-flow.html">Cash-flow</a>
         <a href="fx-margin.html">FX margin</a>
         <a href="fx-pricing.html">Pricing test</a>
+        <a href="ai-steward.html">AI steward</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -37,7 +38,7 @@
         with a walk-forward backtest and a dollar metric.
       </p>
       <div class="links">
-        <a class="button primary" href="fx-pricing.html">See the latest project</a>
+        <a class="button primary" href="ai-steward.html">See the latest project</a>
         <a class="button" href="https://github.com/marlondocouto2">GitHub</a>
       </div>
     </section>
@@ -68,11 +69,12 @@
         <p>An A/B test of raising a corridor's FX markup, from sample size to the launch decision: CUPED, sequential testing, segments, a fitted demand curve, plus switchbacks and diff-in-diff for treasury.</p>
         <div class="metric">+16% profit<small>with tiered pricing vs +11% for one price · daily peeking: 27% false positives</small></div>
       </a>
-      <div class="card muted">
-        <span class="tag">Project 5 · In progress</span>
-        <h3>AI treasury analyst</h3>
-        <p>A daily brief for treasury leadership: numbers computed in code, commentary written by an LLM, every claim checked before it's sent.</p>
-      </div>
+      <a class="card" href="ai-steward.html">
+        <span class="tag">Project 5 · AI agent</span>
+        <h3>AI model steward</h3>
+        <p>An AI agent reviews the Project 3 model every week: it diagnoses, backtests, tunes and recommends keep or switch, within guardrails it can't change. Compared with plain automation on replayed weeks.</p>
+        <div class="metric">−2.34% error<small>from a weak champion vs −1.60% (scripted) and −1.48% (Optuna) · about half the backtests · $0 to run</small></div>
+      </a>
     </div>
 
     <h2>How each project is built</h2>

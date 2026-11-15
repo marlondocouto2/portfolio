@@ -203,6 +203,100 @@ def export_pricing(repo: Path) -> dict:
     }
 
 
+STEWARD_METHODS = {"never": "Never retrain", "scripted": "Scripted playbook",
+                   "automation": "Optuna automation", "agent": "AI agent"}
+
+
+def _ledger_line(e: dict) -> str:
+    """One readable line per ledger entry (the same summary as the project's weekly report)."""
+    r, c = e["result"], e["command"]
+    try:
+        if c == "backtest":
+            return f"{r['label']}: MAE {r['mae_bps']} bps ({r['mae_change_vs_champion_pct']:+}% vs champion)"
+        if c == "tune":
+            return f"{r['label']}: CV MAE {r['cv_mae_bps_start']} → {r['cv_mae_bps_best']} bps"
+        if c == "promote":
+            return (f"{r['challenger']}: {r['challenger_mae_bps']} vs {r['champion_mae_bps']} bps, "
+                    f"p = {r['dm_p_value']}, {'passed' if r['passed'] else 'failed'}")
+        if c == "champion-report":
+            m = r["mae_bps"]
+            return f"champion MAE last 4w {m['last_4w']}, last 26w {m['last_26w']}, prior 26w {m['prior_26w']} bps"
+        if c == "diagnose":
+            return f"where {r['config']} goes wrong: bias, weekday, volatility regime"
+        if c == "data-summary":
+            return f"market data through {r['data_through']}"
+        if c == "submit":
+            return "memo accepted" if r["accepted"] else "memo rejected: " + "; ".join(r["errors"])
+    except (KeyError, TypeError):
+        pass
+    return ""
+
+
+def _agent_weeks(run_dir: Path) -> list[dict]:
+    """The AI agent's weekly runs: decision, memo and ledger, for the page's week viewer."""
+    weeks = []
+    for d in sorted(run_dir.glob("*/state.json")):
+        d = d.parent
+        state = json.loads((d / "state.json").read_text())
+        rec = json.loads((d / "recommendation.json").read_text())
+        score = json.loads((d / "score.json").read_text())
+        ledger = [json.loads(x) for x in (d / "ledger.jsonl").read_text().splitlines() if x.strip()]
+        weeks.append({
+            "cutoff": state["cutoff"], "decision": rec["decision"], "diagnosis": rec["diagnosis"],
+            "evidence": rec["evidence"], "risks": rec["risks"], "watch": rec["watch_next_week"],
+            "used": state["used"], "submissions": state["submissions"],
+            "chosen": score["chosen"],
+            "start_future_mae_bps": score["start_future_mae_bps"],
+            "chosen_future_mae_bps": score["chosen_future_mae_bps"],
+            "ledger": [{"id": e["id"], "command": e["command"], "summary": _ledger_line(e)} for e in ledger],
+        })
+    return weeks
+
+
+def export_steward(repo: Path) -> dict:
+    """Project 5: an AI agent that reviews the FX margin model every week, vs non-AI baselines."""
+    def summary(path: Path) -> list[dict]:
+        out = []
+        for x in _read_csv(path):
+            out.append({"method": STEWARD_METHODS[x["method"]], "weeks": int(x["weeks"]),
+                        "switches": int(x["switches"]), "promotion_tests": int(x["promotion_tests"]),
+                        "future_mae_bps": _num(x["future_MAE_bps"], 2), "future_mae_usd": _num(x["future_MAE_usd"], 0),
+                        "change_pct": _num(x["change_vs_never_pct"], 2),
+                        "if_rule_ignored_mae_bps": _num(x["if_rule_ignored_MAE_bps"], 2),
+                        "first_try": _num(x["memo_first_try_pass_rate"], 3)})
+        raw = {STEWARD_METHODS[x["method"]]: float(x["if_rule_ignored_MAE_bps"]) for x in _read_csv(path)}
+        never = raw["Never retrain"]
+        for r in out:
+            r["if_rule_ignored_pct"] = round((raw[r["method"]] - never) / never * 100, 2)
+        return out
+
+    def weeks(path: Path) -> list[dict]:
+        rows = []
+        for x in _read_csv(path):
+            prop = _num(x["proposed_future_mae_bps"], 2)
+            rows.append({"method": STEWARD_METHODS[x["method"]], "cutoff": x["cutoff"],
+                         "decision": x["decision"], "proposed": x["proposed"] or None,
+                         "proposed_vs_never": None if prop is None else round(prop - float(x["start_future_mae_bps"]), 2),
+                         "chosen_vs_never": round(float(x["chosen_future_mae_bps"]) - float(x["start_future_mae_bps"]), 2),
+                         "backtests": int(x["used_backtest"])})
+        return rows
+
+    reports = repo / "reports"
+    return {
+        "title": "AI model steward", "repo": "https://github.com/marlondocouto2/ai-model-steward",
+        "tests": {
+            "strong_all": summary(reports / "results.csv"),
+            "strong_sample": summary(reports / "results_agent_weeks.csv"),
+            "weak_sample": summary(reports / "weak" / "results.csv"),
+        },
+        "timeline": [w for w in weeks(reports / "replay_weeks.csv") if w["method"] != "AI agent"],
+        "weak_weeks": weeks(reports / "weak" / "replay_weeks.csv"),
+        "strong_weeks": [w for w in weeks(reports / "replay_weeks.csv") if w["method"] != "Never retrain"],
+        "agent": {"strong": _agent_weeks(repo / "runs" / "replay" / "agent"),
+                  "weak": _agent_weeks(repo / "runs" / "replay-weak" / "agent")},
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -215,6 +309,7 @@ def main() -> None:
         "cashflow.json": export_cashflow(args.projects_dir / "cash-flow-forecaster"),
         "fxmargin.json": export_fx(args.projects_dir / "fx-margin-forecaster"),
         "pricing.json": export_pricing(args.projects_dir / "fx-pricing-experiment"),
+        "steward.json": export_steward(args.projects_dir / "ai-model-steward"),
     }
     for name, data in exports.items():
         path = OUT / name

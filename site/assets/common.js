@@ -68,6 +68,10 @@
     Sequential: "orange",
     "US→MX": "orange",
     "US→GT": "blue",
+    "Never retrain": "gray",
+    "Scripted playbook": "orange",
+    "Optuna automation": "blue",
+    "AI agent": "violet",
   };
   function color(model) {
     const hue = HUES[MODEL_HUE[model]] || ["#8a8984", "#8f8e86"];
@@ -204,7 +208,7 @@
 
   // Bump ASSET_VERSION (and the ?v= on each page's <script>/<link> tags) whenever the site changes,
   // so browsers fetch the new files instead of mixing cached old ones with new ones.
-  const ASSET_VERSION = "2026-11-14";
+  const ASSET_VERSION = "2026-11-15";
 
   async function loadJSON(path) {
     const res = await fetch(`${path}?v=${ASSET_VERSION}`);

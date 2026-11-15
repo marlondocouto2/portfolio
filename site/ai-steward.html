@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI model steward · Marlon Do Couto</title>
+  <meta name="description" content="An AI agent reviews an FX margin model every week: it diagnoses, backtests, tunes and recommends, within guardrails. Compared with plain automation over replayed weeks. Interactive results.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15">
+  <script src="assets/common.js?v=2026-11-15"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+  <script defer src="assets/steward.js?v=2026-11-15"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Marlon Do Couto</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="about.html">About</a>
+        <a href="weekday-seasonal.html">Weekday</a>
+        <a href="cash-flow.html">Cash-flow</a>
+        <a href="fx-margin.html">FX margin</a>
+        <a href="fx-pricing.html">Pricing test</a>
+        <a href="ai-steward.html" aria-current="page">AI steward</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Project 5 · AI agent</div>
+      <h1>An AI agent that maintains a forecasting model</h1>
+      <p class="lead">
+        Every week, new FX data arrives and the production margin model from
+        <a href="fx-margin.html">Project 3</a> may no longer be the best choice. Here an AI agent does
+        the weekly review a data scientist would do: it diagnoses what changed, backtests and tunes
+        challengers within a budget, and recommends <strong>keep</strong> or <strong>switch</strong>
+        in a pull request. Plain Python computes every number, enforces the rules and checks the memo.
+        A human merges.
+      </p>
+      <div class="links">
+        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward">Code on GitHub</a>
+        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward/blob/main/AGENT.md">Agent instructions</a>
+        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward/tree/main/runs/replay-weak/agent">Agent runs</a>
+      </div>
+    </section>
+
+    <div class="kpis" id="kpis"></div>
+
+    <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
+
+    <section class="panel">
+      <h3>Does the AI agent choose better models?</h3>
+      <p class="sub" id="tests-sub"></p>
+      <div class="controls">
+        <div><span class="control-label">Test</span><span id="test"></span></div>
+      </div>
+      <div id="tests" class="chart" role="img" aria-label="Change in future error vs never retraining, by method, with and without the promotion rule"></div>
+      <div class="table-wrap"><table id="tests-table"></table></div>
+    </section>
+
+    <section class="panel">
+      <h3>Inside one of the agent's weeks</h3>
+      <p class="sub">The agent's own memo, with the ledger of every tool call it made. Each number in the memo was checked against the ledger entries it cites before the memo was accepted.</p>
+      <div class="controls">
+        <div><span class="control-label">Starting champion</span><span id="memo-test"></span></div>
+        <div><span class="control-label">Week</span><select id="memo-week" aria-label="Week"></select></div>
+      </div>
+      <div class="memo" id="memo"></div>
+      <div class="table-wrap" style="margin-top:12px"><table class="ledger" id="ledger"></table></div>
+    </section>
+
+    <section class="panel">
+      <h3>Week by week: what each proposal would have done</h3>
+      <p class="sub">The strong-champion replay without AI, 136 weeks. Each dot is one week's proposed challenger: its error over the next 12 weeks minus the champion's. Below zero means it would have helped. Outlined dots are the weeks the promotion rule let a switch through.</p>
+      <div class="controls"><div><span class="control-label">Methods</span><span id="methods"></span></div></div>
+      <div id="timeline" class="chart" role="img" aria-label="Future error of each week's proposed challenger vs never retraining"></div>
+    </section>
+
+    <section class="panel">
+      <h3>The guardrails</h3>
+      <p class="sub">The agent decides what to try and why. Everything below is plain Python it can't change.</p>
+      <div class="table-wrap">
+        <table class="ledger">
+          <tbody>
+            <tr><td>1</td><td><strong>Config space</strong></td><td>4 model families, 6 feature groups, 4 training windows, 2 refit frequencies, 3 EWMA half-lives, hyperparameters within fixed ranges. Nothing else can be deployed.</td></tr>
+            <tr><td>2</td><td><strong>Hidden window</strong></td><td>Model errors from the last 8 weeks are hidden. Development tools score only the 26 weeks before them.</td></tr>
+            <tr><td>3</td><td><strong>Budget</strong></td><td>15 backtests, 2 tuning runs and 1 promotion test a week, enforced by the tools.</td></tr>
+            <tr><td>4</td><td><strong>Promotion rule</strong></td><td>On the hidden window, a challenger needs at least 1% lower error, a one-sided Diebold–Mariano p-value below 0.10, and a 5% risk band breached on 2–9% of days.</td></tr>
+            <tr><td>5</td><td><strong>Memo checks</strong></td><td>Every number must match a cited ledger value, "better/worse" must match the sign, and a switch needs a passed test. After 3 failed tries the week is escalated and the champion stays.</td></tr>
+            <tr><td>6</td><td><strong>Pull request</strong></td><td>The agent proposes; CI checks it only touched the champion, reports and data; a human merges.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="prose">
+      <h2>What the results show</h2>
+      <ul>
+        <li><strong>A strong model is hard to beat, and blind automation makes it worse.</strong> Starting from Project 3's tuned XGBoost, the scripted playbook and Optuna found a challenger that looked better in development nearly every week. Accepted without the rule, those challengers would have raised error over the following 12 weeks by 1.07% and 0.35%.</li>
+        <li><strong>The agent held back when there was nothing to gain.</strong> On 16 sampled weeks it kept the strong champion every time and used about 6 of its 15 backtests. On the same weeks, the baselines proposed 24 challengers, and 15 of them would have done worse.</li>
+        <li><strong>With a weak champion, the agent found the most.</strong> Starting from stage 1 only, it cut error by 2.34%, against 1.60% and 1.48% for the baselines, with about half their backtests. It built lean models on the markup and lagged-residual features, the inputs Project 3's SHAP analysis ranked highest. It made only 4 switches, so read this as promising, not proven.</li>
+        <li><strong>The promotion rule has a cost.</strong> The same 8-week test that protected the strong champion blocked most real gains for the weak one: accepting every proposal would have cut error by 6–7%. An adaptive rule, with a longer window or a sequential test, is the next step.</li>
+      </ul>
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li><strong>Tools as a command-line interface</strong> (<code>python -m steward ...</code>): status, data summary, champion report, diagnose, backtest, tune, promote, submit. Each result goes into a ledger with an id.</li>
+        <li><strong>Four "brains" use the same tools, budget and rule:</strong> never retrain, a scripted playbook, Optuna over the whole config space, and the AI agent: Claude Code running headless with written instructions.</li>
+        <li><strong>Replay:</strong> each Friday from January 2024 to August 2026 is replayed from the same starting champion. The agent works in a sandbox whose data stops at the cutoff, so it can't see the future.</li>
+        <li><strong>Scoring:</strong> each week's chosen model is deployed at the cutoff and scored on the following 12 weeks, which no tool could see.</li>
+        <li><strong>Cost:</strong> $0. The agent runs on an existing Claude plan, without an API bill.</li>
+      </ol>
+      <p>The model, data and simulated business come from <a href="fx-margin.html">Project 3</a>, installed as a package. Full details are in the <a href="https://github.com/marlondocouto2/ai-model-steward">README</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">FX rates are real (FRED); the business layer is simulated. Results exported from the project's replay by <code>scripts/export_data.py</code>. <a href="./">Back to all projects</a></div>
+  </footer>
+</body>
+</html>
