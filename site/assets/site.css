@@ -224,3 +224,5 @@ table.ledger td, table.ledger th { white-space: normal; text-align: left; }
 table.ledger td:first-child { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-3); width: 3.5em; }
 table.ledger td:nth-child(2) { white-space: nowrap; width: 9em; }
 table.ledger tr.hl td { background: var(--accent-soft); }
+table.text td, table.text th { white-space: normal; text-align: left; vertical-align: top; }
+table.text td:first-child { white-space: nowrap; }

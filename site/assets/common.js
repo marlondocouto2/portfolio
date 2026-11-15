@@ -208,7 +208,7 @@
 
   // Bump ASSET_VERSION (and the ?v= on each page's <script>/<link> tags) whenever the site changes,
   // so browsers fetch the new files instead of mixing cached old ones with new ones.
-  const ASSET_VERSION = "2026-11-15";
+  const ASSET_VERSION = "2026-11-15c";
 
   async function loadJSON(path) {
     const res = await fetch(`${path}?v=${ASSET_VERSION}`);

@@ -55,7 +55,8 @@
     });
     const never = get(data.tests[state.test], "Never retrain");
     document.getElementById("tests-sub").textContent = TESTS[state.test][1] +
-      ` Lower is better. Never retraining scored ${never.future_mae_bps.toFixed(2)} bps over the following 12 weeks.`;
+      ` Lower is better. Never retraining scored ${never.future_mae_bps.toFixed(2)} bps over the following 12 weeks. ` +
+      "Solid bars: with the promotion rule (explained below). Hatched: if every proposed challenger had been switched in.";
     const best = Math.min(...rows.map((r) => r.change_pct));
     document.getElementById("tests-table").innerHTML =
       "<thead><tr><th>Method</th><th>Switches</th><th>Promotion tests</th><th>Future MAE</th><th>vs never</th>" +

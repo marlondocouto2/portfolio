@@ -6,10 +6,10 @@
   <title>AI model steward · Marlon Do Couto</title>
   <meta name="description" content="An AI agent reviews an FX margin model every week: it diagnoses, backtests, tunes and recommends, within guardrails. Compared with plain automation over replayed weeks. Interactive results.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-15">
-  <script src="assets/common.js?v=2026-11-15"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15c">
+  <script src="assets/common.js?v=2026-11-15c"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-  <script defer src="assets/steward.js?v=2026-11-15"></script>
+  <script defer src="assets/steward.js?v=2026-11-15c"></script>
 </head>
 <body>
   <header class="site-header">
@@ -61,6 +61,35 @@
       <div class="table-wrap"><table id="tests-table"></table></div>
     </section>
 
+    <section class="panel" id="promotion-rule">
+      <h3>What is the promotion rule?</h3>
+      <p class="sub">The gate a challenger must pass before it can replace the champion. The agent can recommend a switch, but only this rule can approve it.</p>
+      <div class="prose">
+        <ol>
+          <li><strong>The last 8 weeks are hidden.</strong> All week, the agent's tools score models on the 26 weeks before that. It never sees how any model did in the most recent 8 weeks.</li>
+          <li><strong>One test a week.</strong> The agent picks its best challenger and runs <code>promote</code> once. That scores the champion and the challenger on the hidden 8 weeks, so a challenger can't win just by being tuned to the data the agent was looking at.</li>
+          <li><strong>Three checks, all required:</strong>
+            <ul>
+              <li><strong>Big enough:</strong> at least 1% lower error than the champion. Smaller gains aren't worth changing the production model.</li>
+              <li><strong>Not luck:</strong> a Diebold–Mariano test compares the two models' daily errors and asks how likely a gap this size would be if they were really equally good. That chance must be under 10% (p &lt; 0.10).</li>
+              <li><strong>Honest risk band:</strong> the challenger's 5% margin-at-risk band (from <a href="fx-margin.html">Project 3</a>) must be breached on 2–9% of days, close to the 5% it promises.</li>
+            </ul>
+          </li>
+        </ol>
+        <p>In the chart above, solid bars are what happened <strong>with the rule</strong>. Hatched bars show what would have happened if every challenger the method proposed had been <strong>switched in without the rule</strong>.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="text">
+          <thead><tr><th>Starting champion</th><th>What the challengers were</th><th>What the rule did</th></tr></thead>
+          <tbody>
+            <tr><td>Strong (tuned XGBoost)</td><td>Mostly noise: accepted blindly, they'd have raised error by up to 1.07%</td><td><strong>Protected:</strong> blocked most of them, error stayed flat</td></tr>
+            <tr><td>Weak (EWMA only)</td><td>Real improvements: accepted, they'd have cut error by 6–7%</td><td><strong>Too cautious:</strong> 8 weeks is rarely enough evidence, so it let through only a quarter to a third of the gain</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin-top:12px">The fix is a rule that adapts: a longer hidden window, or a test that keeps collecting evidence week after week until it's sure either way.</p>
+    </section>
+
     <section class="panel">
       <h3>Inside one of the agent's weeks</h3>
       <p class="sub">The agent's own memo, with the ledger of every tool call it made. Each number in the memo was checked against the ledger entries it cites before the memo was accepted.</p>
@@ -88,7 +117,7 @@
             <tr><td>1</td><td><strong>Config space</strong></td><td>4 model families, 6 feature groups, 4 training windows, 2 refit frequencies, 3 EWMA half-lives, hyperparameters within fixed ranges. Nothing else can be deployed.</td></tr>
             <tr><td>2</td><td><strong>Hidden window</strong></td><td>Model errors from the last 8 weeks are hidden. Development tools score only the 26 weeks before them.</td></tr>
             <tr><td>3</td><td><strong>Budget</strong></td><td>15 backtests, 2 tuning runs and 1 promotion test a week, enforced by the tools.</td></tr>
-            <tr><td>4</td><td><strong>Promotion rule</strong></td><td>On the hidden window, a challenger needs at least 1% lower error, a one-sided Diebold–Mariano p-value below 0.10, and a 5% risk band breached on 2–9% of days.</td></tr>
+            <tr><td>4</td><td><strong>Promotion rule</strong></td><td>On the hidden window, a challenger needs at least 1% lower error, a one-sided Diebold–Mariano p-value below 0.10, and a 5% risk band breached on 2–9% of days (<a href="#promotion-rule">explained above</a>).</td></tr>
             <tr><td>5</td><td><strong>Memo checks</strong></td><td>Every number must match a cited ledger value, "better/worse" must match the sign, and a switch needs a passed test. After 3 failed tries the week is escalated and the champion stays.</td></tr>
             <tr><td>6</td><td><strong>Pull request</strong></td><td>The agent proposes; CI checks it only touched the champion, reports and data; a human merges.</td></tr>
           </tbody>
