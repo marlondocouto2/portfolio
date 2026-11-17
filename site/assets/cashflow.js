@@ -5,13 +5,16 @@
   let data;
   try { data = await S.loadJSON("data/cashflow.json"); } catch (e) { S.showError(e); return; }
 
-  const V = data.versions;
+  const ALL = data.versions;
+  const V = ALL.filter((v) => !v.startsWith("6."));       // the ladder, versions 1-5
+  const CH = ALL.find((v) => v.startsWith("6."));         // follow-up: Chronos-2, zero-shot
   const SHORT = {
     "1. Baseline": "1 · Baseline",
     "2. + Spike GMM": "2 · + Spike GMM",
     "3. + Holidays": "3 · + Holidays",
     "4. Prophet + Fourier": "4 · Prophet + Fourier",
     "5. Prophet + Fourier + GMM": "5 · + GMM",
+    "6. Chronos-2 (zero-shot)": "6 · Chronos-2",
   };
   const state = { h: 7, corridor: "MX", versions: new Set([V[0], V[2], V[4]]), range: ["2025-05-03", "2025-05-15"] };
   const result = (v, h) => data.results.find((r) => r.model === v && r.horizon === h);
@@ -27,9 +30,9 @@
 
   // ---- Controls
   S.segmented("horizon", data.horizons.map((h) => [h, `${h} day${h > 1 ? "s" : ""} ahead`]), state.h, (h) => {
-    state.h = h; drawSteps(); drawDayType(); drawExplorer(); drawTable();
+    state.h = h; drawSteps(); drawDayType(); drawExplorer(); drawTable(); drawChronos();
   });
-  S.chips("versions", V, state.versions, drawExplorer, (v) => SHORT[v]);
+  S.chips("versions", ALL, state.versions, drawExplorer, (v) => SHORT[v]);
   const corridorSelect = document.getElementById("corridor");
   corridorSelect.addEventListener("change", () => { state.corridor = corridorSelect.value; drawExplorer(); });
 
@@ -92,7 +95,7 @@
       line: { color: ink, width: 1.4 }, marker: { size: 3.5, color: ink },
       hovertemplate: "%{y:$.1f}M<extra>Actual</extra>",
     }];
-    V.filter((v) => state.versions.has(v)).forEach((v) => traces.push({
+    ALL.filter((v) => state.versions.has(v)).forEach((v) => traces.push({
       x: c.dates, y: c.forecasts[v][String(state.h)], name: SHORT[v], type: "scatter", mode: "lines",
       line: { color: S.color(v), width: 2 }, hovertemplate: `%{y:$.1f}M<extra>${SHORT[v]}</extra>`,
     }));
@@ -137,7 +140,7 @@
                   ["MAE_holiday", "Holiday", S.fmtM], ["MAE_spike", "Random spike", S.fmtM],
                   ["required_buffer", "Buffer", S.fmtM], ["avg_cash_held", "Cash held", S.fmtM],
                   ["idle_cash_cost_per_year", "Idle cost / yr", S.fmtK]];
-    const rows = V.map((v) => result(v, state.h));
+    const rows = ALL.map((v) => result(v, state.h));
     const best = Math.min(...rows.map((r) => r.MAE));
     document.getElementById("table").innerHTML =
       `<thead><tr><th>Version</th>${cols.map((c) => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>` +
@@ -145,7 +148,26 @@
         cols.map(([k, , fmt]) => `<td>${fmt(r[k])}</td>`).join("") + "</tr>").join("") + "</tbody>";
   }
 
-  function drawAll() { drawSteps(); drawDayType(); drawExplorer(); drawTable(); }
+  // Follow-up research: Chronos-2 (zero-shot) against the ladder, by type of day.
+  function drawChronos() {
+    if (!CH) return;
+    const show = [V[0], V[2], V[4], CH];
+    const groups = [["MAE", "All days"], ["MAE_normal", "Normal days"], ["MAE_scheduled", "Payroll Fridays"],
+                    ["MAE_holiday", "Holiday windows"]];
+    S.plot("chronos", show.map((v) => {
+      const r = result(v, state.h);
+      return {
+        type: "bar", name: SHORT[v], x: groups.map((g) => g[1]), y: groups.map((g) => r[g[0]]),
+        marker: { color: S.color(v) }, hovertemplate: `${SHORT[v]}: %{y:$.2f}M<extra>%{x}</extra>`,
+      };
+    }), { barmode: "group", legend: { y: -0.2 } });
+    const c = result(CH, state.h), f = result(V[4], state.h);
+    document.getElementById("chronos-sub").textContent =
+      `Average error per corridor-day, ${state.h} day${state.h > 1 ? "s" : ""} ahead. Chronos-2 with no tuning: ` +
+      `${S.fmtPct(c.MAE_vs_baseline_pct)} vs the baseline, against ${S.fmtPct(f.MAE_vs_baseline_pct)} for the final version.`;
+  }
+
+  function drawAll() { drawSteps(); drawDayType(); drawExplorer(); drawTable(); drawChronos(); }
   drawAll();
   S.onThemeChange(drawAll);
 })();
