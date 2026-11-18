@@ -57,6 +57,7 @@
     "3. + Holidays": "blue",
     "4. Prophet + Fourier": "yellow",
     "5. Prophet + Fourier + GMM": "violet",
+    "6. Chronos-2 (zero-shot)": "gray",
     "Stage 1: moving average": "gray",
     "Stage 1: EWMA": "orange",
     "+ Ridge": "aqua",
@@ -208,7 +209,7 @@
 
   // Bump ASSET_VERSION (and the ?v= on each page's <script>/<link> tags) whenever the site changes,
   // so browsers fetch the new files instead of mixing cached old ones with new ones.
-  const ASSET_VERSION = "2026-11-15c";
+  const ASSET_VERSION = "2026-11-17";
 
   async function loadJSON(path) {
     const res = await fetch(`${path}?v=${ASSET_VERSION}`);

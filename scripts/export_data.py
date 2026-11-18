@@ -75,7 +75,8 @@ def export_weekday(repo: Path) -> dict:
 
 
 def export_cashflow(repo: Path) -> dict:
-    """Project 2: three corridors, five versions, horizons 1/7/30, with day-type flags."""
+    """Project 2: three corridors, five ladder versions plus Chronos-2 (version 6), horizons
+    1/7/30, with day-type flags."""
     rows = _read_csv(repo / "reports" / "backtest_forecasts.csv.gz")
     results = _read_csv(repo / "reports" / "results.csv")
     versions = sorted({r["model"] for r in rows})
