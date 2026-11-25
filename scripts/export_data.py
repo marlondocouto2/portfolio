@@ -246,6 +246,8 @@ def _agent_weeks(run_dir: Path) -> list[dict]:
             "cutoff": state["cutoff"], "decision": rec["decision"], "diagnosis": rec["diagnosis"],
             "evidence": rec["evidence"], "risks": rec["risks"], "watch": rec["watch_next_week"],
             "used": state["used"], "submissions": state["submissions"],
+            "start": next((e["result"]["champion"] for e in ledger if e["command"] == "champion-report"),
+                          score["chosen"]),
             "chosen": score["chosen"],
             "start_future_mae_bps": score["start_future_mae_bps"],
             "chosen_future_mae_bps": score["chosen_future_mae_bps"],

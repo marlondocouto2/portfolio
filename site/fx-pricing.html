@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FX pricing experiment · Marlon Do Couto</title>
+  <title>Pricing experiment · Marlon Do Couto</title>
   <meta name="description" content="An A/B test of FX markups for a remittance corridor, from design to decision: power, CUPED, sequential testing, segments, demand curves, switchbacks and difference-in-differences. Interactive results.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17">
-  <script src="assets/common.js?v=2026-11-17"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-25g">
+  <script src="assets/common.js?v=2026-11-25g"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-  <script defer src="assets/pricing.js?v=2026-11-17"></script>
+  <script defer src="assets/pricing.js?v=2026-11-25g"></script>
 </head>
 <body>
   <header class="site-header">
@@ -30,16 +30,11 @@
 
   <main class="wrap">
     <section class="hero">
-      <div class="eyebrow">Project 4 · Experimentation</div>
-      <h1>Should a remittance corridor raise its FX markup?</h1>
-      <p class="lead">
-        A money-transfer business earns most of its revenue on the FX markup. Raising it earns more per
-        transfer but loses customers. This project designs and analyzes an A/B test of raising the
-        U.S. → Mexico markup from <strong>1.5% to 2.0%</strong>, from sample size to the launch decision,
-        then tests a treasury funding rule where customers can't be randomized at all. Every user is
-        simulated with <strong>both potential outcomes</strong>, so each method is checked against the
-        true effect.
-      </p>
+      <div class="eyebrow">Project 4 · Experiments</div>
+      <h1>Pricing experiment</h1>
+      <p class="lead"><strong>The problem:</strong> a money-transfer company earns most of its money from a small fee built into the exchange rate (the markup). Raising it from 1.5% to 2.0% earns more on each transfer, but some customers will leave. Is it worth it?</p>
+      <p class="lead"><strong>What I built:</strong> an A/B test, where half the customers see the new price and half the old one, designed and analysed from start to finish. The customers are simulated, so their true reaction is known and every method can be checked against it.</p>
+      <p class="lead"><strong>The result:</strong> charging small senders 2.0% and large senders 1.5% gives +16% profit, against +11% for one price for everyone. Large senders are price-sensitive, so it's better to leave their price alone.</p>
       <div class="links">
         <a class="button" href="https://github.com/marlondocouto2/fx-pricing-experiment">Code on GitHub</a>
         <a class="button" href="https://github.com/marlondocouto2/fx-pricing-experiment/blob/main/EXPERIMENT_DESIGN.md">Experiment design</a>
@@ -55,68 +50,69 @@
       <h3>Who wins and who loses</h3>
       <p class="sub" id="effects-sub"></p>
       <div class="controls">
-        <div><span class="control-label">Launch option</span><span id="option"></span></div>
+        <div><span class="control-label">Pricing option</span><span id="option"></span></div>
       </div>
-      <div id="effects" class="chart" role="img" aria-label="True effect of the price change by metric and segment"></div>
+      <div id="effects" class="chart" role="img" aria-label="True effect of the price change by measure and customer group"></div>
     </section>
 
     <section class="panel">
-      <h3>What's the best markup?</h3>
+      <h3>What's the best fee?</h3>
       <p class="sub" id="demand-sub"></p>
       <div class="controls">
         <div><span class="control-label">Senders</span><span id="tier"></span></div>
-        <div><span class="control-label">Metric</span><span id="metric"></span></div>
+        <div><span class="control-label">Show</span><span id="metric"></span></div>
       </div>
-      <div id="demand" class="chart" role="img" aria-label="Revenue or profit per quoted user by markup, fitted and true"></div>
+      <div id="demand" class="chart" role="img" aria-label="Revenue or profit per customer at each fee, estimated and true"></div>
     </section>
 
     <div class="grid-2">
       <section class="panel">
-        <h3>The readout, with and without CUPED</h3>
+        <h3>Measuring the result more precisely</h3>
         <p class="sub" id="readout-sub"></p>
-        <div id="readout" class="chart short" role="img" aria-label="Measured revenue lift and 95% confidence interval by method"></div>
+        <div id="readout" class="chart short" role="img" aria-label="Measured revenue gain and its likely range, by method"></div>
       </section>
       <section class="panel">
-        <h3>Why peeking breaks p-values</h3>
-        <p class="sub">Share of 1,000 A/A tests (no real effect) declared significant, by how often the results were checked.</p>
-        <div id="peeking" class="chart short" role="img" aria-label="False-positive rate by peeking strategy"></div>
+        <h3>Why you shouldn't check results every day</h3>
+        <p class="sub">1,000 fake tests where the price change does nothing. How often each approach wrongly declares a winner. It should be 5%.</p>
+        <div id="peeking" class="chart short" role="img" aria-label="False alarms by how often results are checked"></div>
       </section>
     </div>
 
     <section class="panel">
-      <h3>When customers can't be randomized: testing a prefunding rule</h3>
+      <h3>Testing a rule you can't split by customer</h3>
       <p class="sub" id="switchback-sub"></p>
-      <div id="switchback" class="chart" role="img" aria-label="Estimated saving of the new funding rule under four test designs"></div>
+      <div id="switchback" class="chart" role="img" aria-label="Estimated saving of the new cash rule under four test designs"></div>
     </section>
 
     <section class="panel">
-      <h3>Difference-in-differences: a launch in one corridor</h3>
+      <h3>Measuring a launch with no test group</h3>
       <p class="sub" id="did-sub"></p>
       <div class="controls">
         <div><span class="control-label">Scenario</span><span id="scenario"></span></div>
       </div>
-      <div id="did" class="chart" role="img" aria-label="Revenue per user in the launch corridor and the comparison corridor"></div>
+      <div id="did" class="chart" role="img" aria-label="Revenue per customer in the launch country and the comparison country"></div>
     </section>
 
     <section class="prose">
-      <h2>What the results show</h2>
+      <h2>What I learned</h2>
       <ul>
-        <li><strong>The higher price wins on average, but the average hides two opposite stories.</strong> Small senders bring in more profit. Large senders, 12% of users but a third of profit, shop around: they send 38% less and their repeat sending falls by 39%.</li>
-        <li><strong>Tiered pricing beats a single price.</strong> 2.0% for small senders and 1.5% for large ones roughly doubles the revenue gain and halves the volume loss, which passes a 15% non-inferiority guardrail that a single 2.0% fails.</li>
-        <li><strong>Large senders' best markup is below today's price.</strong> The demand curve fit on three tested prices puts it near 1.25%. That's outside the tested range, so the next test needs a lower arm.</li>
-        <li><strong>Design choices change the answer.</strong> Peeking daily turns a 5% false-positive rate into 27%. Running two funding rules one after the other gives opposite conclusions depending on which rule meets a demand surge.</li>
+        <li><strong>An average can hide two opposite stories.</strong> The higher price wins overall, but large senders (12% of customers, a third of profit) shop around: they send 38% less and come back 39% less often.</li>
+        <li><strong>So one price isn't the best answer.</strong> Keeping large senders at 1.5% roughly doubles the revenue gain and halves the volume lost.</li>
+        <li><strong>How you run a test can change its answer.</strong> Checking results every day turns 5% false alarms into 27%. Testing two rules one after the other gives opposite answers depending on which one meets a busy period.</li>
+        <li><strong>The next test should try a lower price</strong> for large senders. The estimated best is near 1.25%, below anything tested so far.</li>
       </ul>
-      <h2>How it works</h2>
+
+      <h2>For the technical reader</h2>
       <ol class="steps">
         <li><strong>Design first:</strong> revenue per quoted user as the primary metric (non-senders count as $0), volume and repeat sending as guardrails, user-level randomization, a two-sided test.</li>
         <li><strong>Simulated users</strong> with an S-shaped price response that is steeper for large senders, log-normal amounts and pre-test history, and both potential outcomes kept.</li>
         <li><strong>Power analysis:</strong> about 88,000 users per arm for a 3% minimum detectable effect, checked with 300 simulated experiments.</li>
         <li><strong>Readout:</strong> a sample-ratio check, Welch's difference in means, and CUPED with pre-test variables only.</li>
         <li><strong>Sequential testing:</strong> O'Brien-Fleming boundaries at four weekly looks, on cohorts whose 14-day window has closed.</li>
-        <li><strong>Decision:</strong> profit vs revenue, a planned segment with an interaction test, non-inferiority guardrails, and a logistic demand curve to find the best markup.</li>
+        <li><strong>Decision:</strong> profit vs revenue, a planned segment with an interaction test, a 15% non-inferiority guardrail on volume, and a logistic demand curve to find the best markup.</li>
         <li><strong>Treasury designs:</strong> randomized switchbacks for a corridor's daily funding rule, and difference-in-differences with placebo tests.</li>
       </ol>
-      <p>The design, with what to change in the next test, is in the <a href="https://github.com/marlondocouto2/fx-pricing-experiment/blob/main/EXPERIMENT_DESIGN.md">experiment design</a>. The funding rule tested here is built on the <a href="weekday-seasonal.html">Project 1</a> forecast.</p>
+      <p>The design, with what to change in the next test, is in the <a href="https://github.com/marlondocouto2/fx-pricing-experiment/blob/main/EXPERIMENT_DESIGN.md">experiment design</a>. The cash rule tested here is built on the <a href="weekday-seasonal.html">Project 1</a> forecast.</p>
     </section>
   </main>
 
