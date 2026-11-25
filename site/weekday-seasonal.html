@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Weekday-seasonal forecaster · Marlon Do Couto</title>
-  <meta name="description" content="A small, explainable daily-flow forecaster that beats naive baselines by 35–58%. Interactive backtest results.">
+  <title>Daily payment forecast · Marlon Do Couto</title>
+  <meta name="description" content="A simple daily payment forecast, 35% more accurate than copying last week, so a payments company can hold $10.7M less cash a day. Interactive results.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17">
-  <script src="assets/common.js?v=2026-11-17"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-25g">
+  <script src="assets/common.js?v=2026-11-25g"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-  <script defer src="assets/weekday.js?v=2026-11-17"></script>
+  <script defer src="assets/weekday.js?v=2026-11-25g"></script>
 </head>
 <body>
   <header class="site-header">
@@ -18,11 +18,11 @@
       <nav class="nav" aria-label="Main">
         <a href="./">Home</a>
         <a href="about.html">About</a>
-        <a href="weekday-seasonal.html" aria-current="page">Weekday</a>
-        <a href="cash-flow.html">Cash-flow</a>
-        <a href="fx-margin.html">FX margin</a>
+        <a href="weekday-seasonal.html" aria-current="page">Daily forecast</a>
+        <a href="cash-flow.html">Unusual days</a>
+        <a href="fx-margin.html">Currency risk</a>
         <a href="fx-pricing.html">Pricing test</a>
-        <a href="ai-steward.html">AI steward</a>
+        <a href="ai-steward.html">AI reviewer</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -30,13 +30,11 @@
 
   <main class="wrap">
     <section class="hero">
-      <div class="eyebrow">Project 1 · Seasonal baseline</div>
-      <h1>Weekday-seasonal forecaster</h1>
-      <p class="lead">
-        A treasury team funds each day's payments before the day starts. Too low and they're short;
-        too high and cash sits idle. This model forecasts daily volume 1–30 days ahead with one sentence:
-        <strong>recent level × day-of-week effect × payday effect</strong>.
-      </p>
+      <div class="eyebrow">Project 1 · Forecasting</div>
+      <h1>Daily payment forecast</h1>
+      <p class="lead"><strong>The problem:</strong> a payments company has to set aside cash every morning for that day's payments. Too little and it runs short; too much and money sits idle.</p>
+      <p class="lead"><strong>What I built:</strong> a simple forecast. Take the recent average, then adjust it for the day of the week and for paydays.</p>
+      <p class="lead"><strong>The result:</strong> 35% more accurate than copying last week, so the company can keep $10.7M less cash on hand each day.</p>
       <div class="links">
         <a class="button" href="https://github.com/marlondocouto2/weekday-seasonal-forecaster">Code on GitHub</a>
         <a class="button" href="https://github.com/marlondocouto2/weekday-seasonal-forecaster/blob/main/METHODOLOGY.md">Methodology</a>
@@ -49,79 +47,79 @@
     <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
 
     <section class="panel">
-      <h3>Explore the forecasts</h3>
-      <p class="sub">A year of walk-forward forecasts (2025): at every day each model was refit on data up to that day only. Drag the slider under the chart to move through the year.</p>
+      <h3>See the forecasts</h3>
+      <p class="sub">A year of daily forecasts (2025). Each one was made using only the data available up to that day, as if it were live. Drag the slider under the chart to move through the year.</p>
       <div class="controls">
-        <div><span class="control-label">Horizon</span><span id="horizon"></span></div>
-        <div><span class="control-label">Models</span><span id="models"></span></div>
+        <div><span class="control-label">Days ahead</span><span id="horizon"></span></div>
+        <div><span class="control-label">Show</span><span id="models"></span></div>
         <div><span class="control-label">Jump to</span><span id="presets"></span></div>
       </div>
-      <div id="explorer" class="chart tall" role="img" aria-label="Actual daily volume vs each model's forecast"></div>
+      <div id="explorer" class="chart tall" role="img" aria-label="Actual daily payments vs each model's forecast"></div>
     </section>
 
     <div class="grid-2">
       <section class="panel">
-        <h3>Average error by horizon</h3>
-        <p class="sub">Mean absolute error per day. Lower is better.</p>
-        <div id="mae" class="chart short" role="img" aria-label="MAE by model and horizon"></div>
+        <h3>How far off, on average</h3>
+        <p class="sub">The average miss per day, in dollars. Lower is better.</p>
+        <div id="mae" class="chart short" role="img" aria-label="Average miss by model and days ahead"></div>
       </section>
       <section class="panel">
-        <h3>Required cash buffer</h3>
-        <p class="sub">Extra cash held on top of the forecast to cover shortfalls on 95% of days. Lower is better; see the explanation below.</p>
-        <div id="buffer" class="chart short" role="img" aria-label="Required buffer by model and horizon"></div>
+        <h3>Cash kept in reserve</h3>
+        <p class="sub">Extra cash needed on top of the forecast so the company doesn't run short on 95% of days. Lower is better.</p>
+        <div id="buffer" class="chart short" role="img" aria-label="Cash reserve needed by model and days ahead"></div>
       </section>
     </div>
 
     <section class="panel">
-      <h3>What is the required buffer?</h3>
-      <p class="sub">The dollar metric of this project: how much extra cash treasury has to hold so a forecast miss doesn't leave it short.</p>
+      <h3>Why the reserve matters</h3>
+      <p class="sub">This is where accuracy turns into money.</p>
       <div class="prose">
-        <ol>
-          <li><strong>Shortfall.</strong> Each day, if actual payments come in <em>higher</em> than the forecast, the gap is a shortfall: cash that wasn't funded in advance and has to be found on the day, usually at a cost. If payments come in lower, the shortfall is zero (that money sits idle instead).</li>
-          <li><strong>Collect a year of them.</strong> The backtest gives 365 daily shortfalls per model.</li>
-          <li><strong>Take the 95th percentile.</strong> The buffer is the amount that covers the shortfall on 95 days out of 100. Fund "forecast + buffer" every morning and you're short on only about 1 day in 20.</li>
-        </ol>
-        <p>A model with smaller, steadier errors needs a smaller buffer for the same protection. Seven days ahead:</p>
+        <ul>
+          <li><strong>When payments come in higher than forecast</strong>, the company is short and has to find cash on the day, usually at a cost.</li>
+          <li><strong>So it keeps a reserve</strong> on top of the forecast: enough to cover the shortfall on 95 days out of 100.</li>
+          <li><strong>A better forecast misses by less</strong>, so it needs a smaller reserve for the same protection.</li>
+        </ul>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Model</th><th>Required buffer</th><th>Extra cash vs the seasonal model</th></tr></thead>
+          <thead><tr><th>Forecast (7 days ahead)</th><th>Reserve needed</th><th>Extra cash vs my model</th></tr></thead>
           <tbody>
-            <tr class="best"><td>SeasonalWeekday</td><td>$15.8M a day</td><td>–</td></tr>
-            <tr><td>NaiveWeekly (same day last week)</td><td>$26.5M a day</td><td>+$10.7M a day</td></tr>
-            <tr><td>MovingAverage (28-day mean)</td><td>$33.8M a day</td><td>+$18.0M a day</td></tr>
+            <tr class="best"><td>My model (weekday + payday)</td><td>$15.8M a day</td><td>–</td></tr>
+            <tr><td>Same day last week</td><td>$26.5M a day</td><td>+$10.7M a day</td></tr>
+            <tr><td>Average of the last 28 days</td><td>$33.8M a day</td><td>+$18.0M a day</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="sub" style="margin-top:12px">Holding $10.7M less every day than the naive rule, for the same 95% protection, is worth roughly $535k a year at an illustrative 5% annual cost of capital. Daily volumes here average about $97M.</p>
+      <p class="sub" style="margin-top:12px">Holding $10.7M less every day is worth about $535k a year, if cash costs 5% a year. Payments here average about $97M a day.</p>
     </section>
 
     <section class="panel">
-      <h3>Where each model goes wrong</h3>
-      <p class="sub" id="weekday-sub">Average error by weekday.</p>
-      <div id="weekday" class="chart short" role="img" aria-label="MAE by weekday"></div>
+      <h3>Errors by day of the week</h3>
+      <p class="sub" id="weekday-sub">Average miss by day of the week.</p>
+      <div id="weekday" class="chart short" role="img" aria-label="Average miss by day of the week"></div>
     </section>
 
     <section class="panel">
-      <h3>Results table</h3>
+      <h3>All the numbers</h3>
       <p class="sub" id="table-sub"></p>
       <div class="table-wrap"><table id="table"></table></div>
     </section>
 
     <section class="prose">
-      <h2>Why the simple model wins</h2>
+      <h2>What I learned</h2>
       <ul>
-        <li><strong>The moving average ignores the weekly pattern.</strong> It predicts nearly the same number every day, so it's always low on Fridays and paydays and high on weekends.</li>
-        <li><strong>Repeating last week copies last week's noise</strong> and puts paydays on the wrong dates: last Tuesday may have been the 1st, this Tuesday is the 8th.</li>
-        <li><strong>The seasonal model estimates each effect from many days</strong>, so only today's noise remains. Its error is close to the 6% noise built into the data, and it holds up to 30 days ahead.</li>
-        <li><strong>What it misses:</strong> the December peak, because it has no yearly component. That, plus spikes and holidays, is what <a href="cash-flow.html">Project 2</a> fixes.</li>
+        <li><strong>A simple, well-built model beats the obvious shortcuts.</strong> Copying last week repeats last week's noise, and puts paydays on the wrong dates. An average ignores the weekly pattern completely.</li>
+        <li><strong>It's almost as good as possible.</strong> Its error is close to the random noise built into the data, and it holds up a full month ahead.</li>
+        <li><strong>What it misses:</strong> December's holiday peak, plus spikes and holidays. That's what <a href="cash-flow.html">Project 2</a> fixes.</li>
       </ul>
-      <h2>How it works</h2>
+
+      <h2>For the technical reader</h2>
       <ol class="steps">
         <li><strong>Weekday factors</strong>, last 12 weeks: each day divided by the average of the week around it, so growth and slow seasonal bumps cancel out.</li>
         <li><strong>Payday factors</strong>, last year: the same idea for five day-of-month buckets (1–3, 4–13, 14–16, 17 to month end, last 3 days).</li>
-        <li><strong>The two are estimated in turn</strong> for three passes, because a payday on a Friday would otherwise inflate Friday.</li>
-        <li><strong>Level</strong>: the average of the last 28 days after removing both effects. Forecast = level × weekday factor × payday factor.</li>
+        <li><strong>Estimated in turn</strong> for three passes, because a payday on a Friday would otherwise inflate Friday.</li>
+        <li><strong>Level:</strong> the average of the last 28 days after removing both effects. Forecast = level × weekday factor × payday factor.</li>
+        <li><strong>Evaluation:</strong> a walk-forward backtest over 2025, refitting at every origin, 1, 7 and 30 days ahead. The reserve is the 95th percentile of daily shortfalls.</li>
       </ol>
       <p>Data: one simulated series, $50M a day growing 15% a year, with known weekday, payday and December effects and 6% noise. The full method with formulas is in the <a href="https://github.com/marlondocouto2/weekday-seasonal-forecaster/blob/main/METHODOLOGY.md">methodology</a>.</p>
     </section>

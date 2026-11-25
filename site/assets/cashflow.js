@@ -8,13 +8,22 @@
   const ALL = data.versions;
   const V = ALL.filter((v) => !v.startsWith("6."));       // the ladder, versions 1-5
   const CH = ALL.find((v) => v.startsWith("6."));         // follow-up: Chronos-2, zero-shot
+  // Plain names for the page; the data keeps the technical names.
   const SHORT = {
-    "1. Baseline": "1 · Baseline",
-    "2. + Spike GMM": "2 · + Spike GMM",
+    "1. Baseline": "1 · Starting point",
+    "2. + Spike GMM": "2 · + Spikes",
     "3. + Holidays": "3 · + Holidays",
-    "4. Prophet + Fourier": "4 · Prophet + Fourier",
-    "5. Prophet + Fourier + GMM": "5 · + GMM",
+    "4. Prophet + Fourier": "4 · Pattern model",
+    "5. Prophet + Fourier + GMM": "5 · Final",
     "6. Chronos-2 (zero-shot)": "6 · Chronos-2",
+  };
+  const LONG = {
+    "1. Baseline": "1. Starting point (Project 1)",
+    "2. + Spike GMM": "2. + Set aside random spikes",
+    "3. + Holidays": "3. + Holiday effects",
+    "4. Prophet + Fourier": "4. Model that learns repeating cycles",
+    "5. Prophet + Fourier + GMM": "5. Cycles + set aside spikes (final)",
+    "6. Chronos-2 (zero-shot)": "6. Chronos-2, ready-made AI model",
   };
   const state = { h: 7, corridor: "MX", versions: new Set([V[0], V[2], V[4]]), range: ["2025-05-03", "2025-05-15"] };
   const result = (v, h) => data.results.find((r) => r.model === v && r.horizon === h);
@@ -22,10 +31,10 @@
   // ---- KPI tiles (7-day horizon)
   const b = result(V[0], 7), f = result(V[4], 7), s3 = result(V[2], 7);
   document.getElementById("kpis").innerHTML = [
-    [`${Math.round((1 - f.MAE / b.MAE) * 100)}%`, "less error than the Project 1 baseline, 7 days ahead"],
-    [S.fmtM(b.avg_cash_held - f.avg_cash_held, 1), "less cash held a day for the same 95% shortfall cover"],
-    [`${S.fmtK(b.idle_cash_cost_per_year)} → ${S.fmtK(f.idle_cash_cost_per_year)}`, "idle-cash cost a year, at a 5% cost of capital"],
-    [`${S.fmtM(s3.MAE_scheduled, 1)} → ${S.fmtM(f.MAE_scheduled, 1)}`, "error on payroll Fridays, once Fourier terms see the 14-day cycle"],
+    [`${Math.round((1 - f.MAE / b.MAE) * 100)}%`, "more accurate than Project 1, 7 days ahead"],
+    [S.fmtM(b.avg_cash_held - f.avg_cash_held, 1), "less cash on hand a day, with the same protection against running short"],
+    [`${S.fmtK(b.idle_cash_cost_per_year)} → ${S.fmtK(f.idle_cash_cost_per_year)}`, "yearly cost of cash sitting idle, if cash costs 5% a year"],
+    [`${S.fmtM(s3.MAE_scheduled, 1)} → ${S.fmtM(f.MAE_scheduled, 1)}`, "average miss on payroll Fridays, once the model learns the two-week cycle"],
   ].map(([v, l]) => `<div class="kpi"><div class="value">${v}</div><div class="label">${l}</div></div>`).join("");
 
   // ---- Controls
@@ -69,12 +78,12 @@
     });
     const total = rows[rows.length - 1].MAE_vs_baseline_pct;
     document.getElementById("steps-sub").textContent =
-      `Average error per corridor-day, ${state.h} day${state.h > 1 ? "s" : ""} ahead: ${S.fmtPct(total)} from the baseline to the final version. Each bar shows the change from the previous one.`;
+      `The average miss per route per day, ${state.h} day${state.h > 1 ? "s" : ""} ahead. Lower is better. Each bar shows how much that step changed the miss. From start to final, the miss falls by ${Math.abs(total).toFixed(1)}%.`;
   }
 
   function drawDayType() {
-    const groups = [["MAE", "All days"], ["MAE_normal", "Normal days"], ["MAE_scheduled", "Payroll Fridays"],
-                    ["MAE_holiday", "Holiday windows"], ["MAE_spike", "Random spikes"]];
+    const groups = [["MAE", "All days"], ["MAE_normal", "Ordinary days"], ["MAE_scheduled", "Payroll Fridays"],
+                    ["MAE_holiday", "Around holidays"], ["MAE_spike", "Random spikes"]];
     S.plot("daytype", V.map((v) => {
       const r = result(v, state.h);
       return {
@@ -134,17 +143,17 @@
 
   function drawTable() {
     document.getElementById("table-sub").textContent =
-      `${state.h} day${state.h > 1 ? "s" : ""} ahead. Errors per corridor-day; buffer, cash held and idle cost on the daily total across corridors.`;
-    const cols = [["MAE", "MAE", S.fmtM], ["MAE_vs_previous_pct", "vs previous", S.fmtPct],
-                  ["MAE_normal", "Normal", S.fmtM], ["MAE_scheduled", "Payroll Fri", S.fmtM],
-                  ["MAE_holiday", "Holiday", S.fmtM], ["MAE_spike", "Random spike", S.fmtM],
-                  ["required_buffer", "Buffer", S.fmtM], ["avg_cash_held", "Cash held", S.fmtM],
+      `${state.h} day${state.h > 1 ? "s" : ""} ahead. Misses are per route per day; the reserve, cash on hand and idle cost are for all three routes together.`;
+    const cols = [["MAE", "Average miss", S.fmtM], ["MAE_vs_previous_pct", "vs previous", S.fmtPct],
+                  ["MAE_normal", "Ordinary days", S.fmtM], ["MAE_scheduled", "Payroll Fridays", S.fmtM],
+                  ["MAE_holiday", "Holidays", S.fmtM], ["MAE_spike", "Random spikes", S.fmtM],
+                  ["required_buffer", "Reserve", S.fmtM], ["avg_cash_held", "Cash on hand", S.fmtM],
                   ["idle_cash_cost_per_year", "Idle cost / yr", S.fmtK]];
     const rows = ALL.map((v) => result(v, state.h));
     const best = Math.min(...rows.map((r) => r.MAE));
     document.getElementById("table").innerHTML =
       `<thead><tr><th>Version</th>${cols.map((c) => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>` +
-      rows.map((r) => `<tr class="${r.MAE === best ? "best" : ""}"><td>${r.model}</td>` +
+      rows.map((r) => `<tr class="${r.MAE === best ? "best" : ""}"><td>${LONG[r.model] || r.model}</td>` +
         cols.map(([k, , fmt]) => `<td>${fmt(r[k])}</td>`).join("") + "</tr>").join("") + "</tbody>";
   }
 
@@ -152,8 +161,8 @@
   function drawChronos() {
     if (!CH) return;
     const show = [V[0], V[2], V[4], CH];
-    const groups = [["MAE", "All days"], ["MAE_normal", "Normal days"], ["MAE_scheduled", "Payroll Fridays"],
-                    ["MAE_holiday", "Holiday windows"]];
+    const groups = [["MAE", "All days"], ["MAE_normal", "Ordinary days"], ["MAE_scheduled", "Payroll Fridays"],
+                    ["MAE_holiday", "Around holidays"]];
     S.plot("chronos", show.map((v) => {
       const r = result(v, state.h);
       return {
@@ -163,8 +172,8 @@
     }), { barmode: "group", legend: { y: -0.2 } });
     const c = result(CH, state.h), f = result(V[4], state.h);
     document.getElementById("chronos-sub").textContent =
-      `Average error per corridor-day, ${state.h} day${state.h > 1 ? "s" : ""} ahead. Chronos-2 with no tuning: ` +
-      `${S.fmtPct(c.MAE_vs_baseline_pct)} vs the baseline, against ${S.fmtPct(f.MAE_vs_baseline_pct)} for the final version.`;
+      `Average miss, ${state.h} day${state.h > 1 ? "s" : ""} ahead. Lower is better. Compared with the starting point, Chronos-2 is ` +
+      `${Math.round(-c.MAE_vs_baseline_pct)}% more accurate; my final version is ${Math.round(-f.MAE_vs_baseline_pct)}% more accurate.`;
   }
 
   function drawAll() { drawSteps(); drawDayType(); drawExplorer(); drawTable(); drawChronos(); }

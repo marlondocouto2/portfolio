@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI model steward · Marlon Do Couto</title>
+  <title>AI model reviewer · Marlon Do Couto</title>
   <meta name="description" content="An AI agent reviews an FX margin model every week: it diagnoses, backtests, tunes and recommends, within guardrails. Compared with plain automation over replayed weeks. Interactive results.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17">
-  <script src="assets/common.js?v=2026-11-17"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-25g">
+  <script src="assets/common.js?v=2026-11-25g"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-  <script defer src="assets/steward.js?v=2026-11-17"></script>
+  <script defer src="assets/steward.js?v=2026-11-25g"></script>
 </head>
 <body>
   <header class="site-header">
@@ -18,11 +18,11 @@
       <nav class="nav" aria-label="Main">
         <a href="./">Home</a>
         <a href="about.html">About</a>
-        <a href="weekday-seasonal.html">Weekday</a>
-        <a href="cash-flow.html">Cash-flow</a>
-        <a href="fx-margin.html">FX margin</a>
+        <a href="weekday-seasonal.html">Daily forecast</a>
+        <a href="cash-flow.html">Unusual days</a>
+        <a href="fx-margin.html">Currency risk</a>
         <a href="fx-pricing.html">Pricing test</a>
-        <a href="ai-steward.html" aria-current="page">AI steward</a>
+        <a href="ai-steward.html" aria-current="page">AI reviewer</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -30,20 +30,15 @@
 
   <main class="wrap">
     <section class="hero">
-      <div class="eyebrow">Project 5 · AI agent</div>
-      <h1>An AI agent that maintains a forecasting model</h1>
-      <p class="lead">
-        Every week, new FX data arrives and the production margin model from
-        <a href="fx-margin.html">Project 3</a> may no longer be the best choice. Here an AI agent does
-        the weekly review a data scientist would do: it diagnoses what changed, backtests and tunes
-        challengers within a budget, and recommends <strong>keep</strong> or <strong>switch</strong>
-        in a pull request. Plain Python computes every number, enforces the rules and checks the memo.
-        A human merges.
-      </p>
+      <div class="eyebrow">Project 5 · AI</div>
+      <h1>AI model reviewer</h1>
+      <p class="lead"><strong>The problem:</strong> a forecasting model can go stale as markets change. Someone has to check it regularly and decide whether to keep it or replace it, and that takes a data scientist's time every week.</p>
+      <p class="lead"><strong>What I built:</strong> an AI (Claude) that does the weekly review of the <a href="fx-margin.html">Project 3</a> model. It looks at what changed, tests a few alternatives and recommends keep or replace. A fixed safety rule then decides whether a replacement is allowed (the AI can't change that rule), and a person gives the final approval.</p>
+      <p class="lead"><strong>The result:</strong> starting from a weak model, the AI improved it the most of four methods, with half the work. Starting from a strong model, it rightly left it alone. It's an early result: 16 weeks tested.</p>
       <div class="links">
         <a class="button" href="https://github.com/marlondocouto2/ai-model-steward">Code on GitHub</a>
-        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward/blob/main/AGENT.md">Agent instructions</a>
-        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward/tree/main/runs/replay-weak/agent">Agent runs</a>
+        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward/blob/main/AGENT.md">The AI's instructions</a>
+        <a class="button" href="https://github.com/marlondocouto2/ai-model-steward/tree/main/runs/replay-weak/agent">The AI's weekly reports</a>
       </div>
     </section>
 
@@ -52,92 +47,68 @@
     <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
 
     <section class="panel">
-      <h3>Two starting models, four methods</h3>
-      <p class="sub">The project varies two things: how good the model in production is at the start of each week (the "champion"), and who does the weekly review.</p>
+      <h3>The test: four reviewers, two starting points</h3>
+      <p class="sub">I replayed past weeks and had four reviewers each decide every week: keep the current model, or replace it. Then I checked how their choice did over the next 12 weeks.</p>
       <div class="table-wrap">
         <table class="text">
-          <thead><tr><th>Starting champion</th><th>The model in production at the start of each week</th></tr></thead>
+          <thead><tr><th>Reviewer</th><th>How it decides</th></tr></thead>
           <tbody>
-            <tr><td><strong>Strong</strong></td><td>Project 3's tuned XGBoost: already very good, so there's little left to improve.</td></tr>
-            <tr><td><strong>Weak</strong></td><td>Project 3's stage 1 only (an EWMA trend with no machine learning): deliberately weaker, so there's real improvement to find.</td></tr>
+            <tr><td><strong>Never change</strong></td><td>Always keeps the current model. The reference point.</td></tr>
+            <tr><td><strong>Fixed checklist</strong></td><td>The same steps every week: try each kind of model, then a few settings one at a time, and keep whatever scores best.</td></tr>
+            <tr><td><strong>Automated search</strong></td><td>An algorithm (Optuna) that tries many combinations of settings and keeps the best.</td></tr>
+            <tr><td><strong>AI reviewer</strong></td><td>Looks at what's going wrong first (which route, which weekday), then tests a few targeted ideas.</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="table-wrap" style="margin-top:12px">
-        <table class="text">
-          <thead><tr><th>Method</th><th>How it reviews the model each week</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Never retrain</strong></td><td>Always keeps the champion. The reference point.</td></tr>
-            <tr><td><strong>Scripted playbook</strong></td><td>A fixed checklist, the same every week, changing one setting at a time and keeping whatever scores best: (1) try each model family with all features; (2) try 3-, 2- and 1-year training windows; (3) try EWMA half-lives of 5 and 20 days; (4) try weekly instead of monthly refits; (5) tune the result's hyperparameters; (6) if it beats the champion in development, run the promotion test. It never looks at <em>why</em> the champion is struggling.</td></tr>
-            <tr><td><strong>Optuna automation</strong></td><td>Searches all settings at once with an algorithm that learns which combinations look promising, then tunes the winner. Smarter than one-at-a-time, but with no understanding of the data.</td></tr>
-            <tr><td><strong>AI agent</strong></td><td>Reads a diagnosis first (which corridor, which weekday, any bias), then tests targeted ideas and decides which candidate deserves the one promotion test.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="margin:16px 0 8px">Never retrain, the scripted playbook and Optuna are the <strong>baselines</strong>: the non-AI methods the agent is compared against. Every method reviewed both starting champions on the same 16 sampled weeks:</p>
+      <p style="margin:16px 0 8px">Each reviewer started from two different models, on the same 16 weeks:</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Starting champion</th><th>Never retrain</th><th>Scripted playbook</th><th>Optuna</th><th>AI agent</th></tr></thead>
+          <thead><tr><th>Starting model</th><th>Never change</th><th>Fixed checklist</th><th>Automated search</th><th>AI reviewer</th></tr></thead>
           <tbody>
-            <tr><td>Strong (tuned XGBoost)</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
-            <tr><td>Weak (EWMA only)</td><td>0.00%</td><td>−1.60%</td><td>−1.48%</td><td><strong>−2.34%</strong></td></tr>
+            <tr><td>Strong (Project 3's best model)</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+            <tr><td>Weak (a simple trend)</td><td>0.00%</td><td>−1.60%</td><td>−1.48%</td><td><strong>−2.34%</strong></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="sub" style="margin-top:8px">Change in error over the following 12 weeks vs never retraining. Lower is better.</p>
-      <div class="prose">
-        <ul>
-          <li><strong>Strong champion:</strong> no method switched, so all four tie. The baselines proposed 24 challengers on these weeks, and 15 of them would have done worse. The agent proposed none.</li>
-          <li><strong>Weak champion:</strong> the agent came out ahead. With the EWMA it spotted a weekday pattern and a bias the EWMA can't capture, and went straight to lean models built on the markup and recent-error features, using about half the backtests of the other two methods.</li>
-          <li><strong>So the agent's possible edge is judgement</strong>: choosing what to test, and which candidate to put forward. It only showed where there was something to find, and on only 4 switches, so it's promising, not proven. Running more weeks costs no money (the agent runs on a Claude plan), only time.</li>
-        </ul>
-      </div>
+      <p class="sub" style="margin-top:8px">Change in the forecast's miss over the next 12 weeks, compared with never changing. Lower is better.</p>
     </section>
 
     <section class="panel">
-      <h3>Does the AI agent choose better models?</h3>
+      <h3>Does the AI choose better models?</h3>
       <p class="sub" id="tests-sub"></p>
       <div class="controls">
         <div><span class="control-label">Test</span><span id="test"></span></div>
       </div>
-      <div id="tests" class="chart" role="img" aria-label="Change in future error vs never retraining, by method, with and without the promotion rule"></div>
+      <div id="tests" class="chart" role="img" aria-label="Change in the forecast's miss by reviewer, with and without the safety rule"></div>
       <div class="table-wrap"><table id="tests-table"></table></div>
     </section>
 
     <section class="panel" id="promotion-rule">
-      <h3>What is the promotion rule?</h3>
-      <p class="sub">The gate a challenger must pass before it can replace the champion. The agent can recommend a switch, but only this rule can approve it.</p>
+      <h3>The safety rule</h3>
+      <p class="sub">The AI can recommend a replacement, but only this rule can approve it.</p>
       <div class="prose">
-        <ol>
-          <li><strong>The last 8 weeks are hidden.</strong> All week, the agent's tools score models on the 26 weeks before that. It never sees how any model did in the most recent 8 weeks.</li>
-          <li><strong>One test a week.</strong> The agent picks its best challenger and runs <code>promote</code> once. That scores the champion and the challenger on the hidden 8 weeks, so a challenger can't win just by being tuned to the data the agent was looking at.</li>
-          <li><strong>Three checks, all required:</strong>
-            <ul>
-              <li><strong>Big enough:</strong> at least 1% lower error than the champion. Smaller gains aren't worth changing the production model.</li>
-              <li><strong>Not luck:</strong> a Diebold–Mariano test compares the two models' daily errors and asks how likely a gap this size would be if they were really equally good. That chance must be under 10% (p &lt; 0.10).</li>
-              <li><strong>Honest risk band:</strong> the challenger's 5% margin-at-risk band (from <a href="fx-margin.html">Project 3</a>) must be breached on 2–9% of days, close to the 5% it promises.</li>
-            </ul>
-          </li>
-        </ol>
-        <p>In the chart above, solid bars are what happened <strong>with the rule</strong>. Hatched bars show what would have happened if every challenger the method proposed had been <strong>switched in without the rule</strong>.</p>
+        <ul>
+          <li><strong>The last 8 weeks are kept hidden</strong> from the reviewer while it experiments, so it can't simply pick whatever fits recent data best.</li>
+          <li><strong>Once a week, its best candidate is tested on those hidden weeks.</strong> It must be at least 1% better, very unlikely to be better by luck, and give a believable bad-day range.</li>
+          <li><strong>If any check fails, the current model stays.</strong> A person still approves every replacement.</li>
+        </ul>
       </div>
       <div class="table-wrap">
         <table class="text">
-          <thead><tr><th>Starting champion</th><th>What the challengers were</th><th>What the rule did</th></tr></thead>
+          <thead><tr><th>Starting model</th><th>What the rule did</th></tr></thead>
           <tbody>
-            <tr><td>Strong (tuned XGBoost)</td><td>Mostly noise: accepted blindly, they'd have raised error by up to 1.07%</td><td><strong>Protected:</strong> blocked most of them, error stayed flat</td></tr>
-            <tr><td>Weak (EWMA only)</td><td>Real improvements: accepted, they'd have cut error by 6–7%</td><td><strong>Too cautious:</strong> 8 weeks is rarely enough evidence, so it let through only a quarter to a third of the gain</td></tr>
+            <tr><td>Strong</td><td><strong>Protected it.</strong> Most proposed replacements were luck, and would have made forecasts up to 1.07% worse. The rule blocked them.</td></tr>
+            <tr><td>Weak</td><td><strong>Too cautious.</strong> The replacements were real improvements (6–7% better), but 8 weeks is rarely enough evidence, so the rule let only a quarter to a third of that gain through.</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="sub" style="margin-top:12px">The fix is a rule that adapts: a longer hidden window, or a test that keeps collecting evidence week after week until it's sure either way.</p>
     </section>
 
     <section class="panel">
-      <h3>Inside one of the agent's weeks</h3>
-      <p class="sub">The agent's own memo, with the ledger of every tool call it made. Each number in the memo was checked against the ledger entries it cites before the memo was accepted.</p>
+      <h3>Inside one of the AI's weeks</h3>
+      <p class="sub">The AI's own report, with a log of every test it ran. Every number in the report was checked against the log before it was accepted.</p>
       <div class="controls">
-        <div><span class="control-label">Starting champion</span><span id="memo-test"></span></div>
+        <div><span class="control-label">Starting model</span><span id="memo-test"></span></div>
         <div><span class="control-label">Week</span><select id="memo-week" aria-label="Week"></select></div>
       </div>
       <div class="memo" id="memo"></div>
@@ -145,46 +116,30 @@
     </section>
 
     <section class="panel">
-      <h3>Week by week: what each proposal would have done</h3>
-      <p class="sub">The strong-champion replay without AI, 136 weeks. Each dot is one week's proposed challenger: its error over the next 12 weeks minus the champion's. Below zero means it would have helped. Outlined dots are the weeks the promotion rule let a switch through. Most dots sit above zero: picking the best of a dozen configs on past data mostly picks the luckiest one. The AI agent isn't shown. It ran on only 16 of these weeks, and with this strong champion it never proposed a challenger, so it would have no dots. Its comparison is in the first chart.</p>
-      <div class="controls"><div><span class="control-label">Methods</span><span id="methods"></span></div></div>
-      <div id="timeline" class="chart" role="img" aria-label="Future error of each week's proposed challenger vs never retraining"></div>
-    </section>
-
-    <section class="panel">
-      <h3>The guardrails</h3>
-      <p class="sub">The agent decides what to try and why. Everything below is plain Python it can't change.</p>
-      <div class="table-wrap">
-        <table class="ledger">
-          <tbody>
-            <tr><td>1</td><td><strong>Config space</strong></td><td>4 model families, 6 feature groups, 4 training windows, 2 refit frequencies, 3 EWMA half-lives, hyperparameters within fixed ranges. Nothing else can be deployed.</td></tr>
-            <tr><td>2</td><td><strong>Hidden window</strong></td><td>Model errors from the last 8 weeks are hidden. Development tools score only the 26 weeks before them.</td></tr>
-            <tr><td>3</td><td><strong>Budget</strong></td><td>15 backtests, 2 tuning runs and 1 promotion test a week, enforced by the tools.</td></tr>
-            <tr><td>4</td><td><strong>Promotion rule</strong></td><td>On the hidden window, a challenger needs at least 1% lower error, a one-sided Diebold–Mariano p-value below 0.10, and a 5% risk band breached on 2–9% of days (<a href="#promotion-rule">explained above</a>).</td></tr>
-            <tr><td>5</td><td><strong>Memo checks</strong></td><td>Every number must match a cited ledger value, "better/worse" must match the sign, and a switch needs a passed test. After 3 failed tries the week is escalated and the champion stays.</td></tr>
-            <tr><td>6</td><td><strong>Pull request</strong></td><td>The agent proposes; CI checks it only touched the champion, reports and data; a human merges.</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3>Why the safety rule matters</h3>
+      <p class="sub">Starting from the strong model, without AI, over 136 weeks. Each dot is one week's proposed replacement: how it would have done over the next 12 weeks compared with keeping the current model. Above zero means it would have made things worse; most did. Outlined dots are the few the rule let through.</p>
+      <div class="controls"><div><span class="control-label">Show</span><span id="methods"></span></div></div>
+      <div id="timeline" class="chart" role="img" aria-label="How each week's proposed replacement would have done"></div>
     </section>
 
     <section class="prose">
-      <h2>What the results show</h2>
+      <h2>What I learned</h2>
       <ul>
-        <li><strong>A strong model is hard to beat, and blind automation makes it worse.</strong> Starting from Project 3's tuned XGBoost, the scripted playbook and Optuna found a challenger that looked better in development nearly every week. Accepted without the rule, those challengers would have raised error over the following 12 weeks by 1.07% and 0.35%.</li>
-        <li><strong>The agent held back when there was nothing to gain.</strong> On 16 sampled weeks it kept the strong champion every time and used about 6 of its 15 backtests. On the same weeks, the baselines proposed 24 challengers, and 15 of them would have done worse.</li>
-        <li><strong>With a weak champion, the agent found the most.</strong> Starting from stage 1 only, it cut error by 2.34%, against 1.60% and 1.48% for the baselines, with about half their backtests. It built lean models on the markup and lagged-residual features, the inputs Project 3's SHAP analysis ranked highest. It made only 4 switches, so read this as promising, not proven.</li>
-        <li><strong>The promotion rule has a cost.</strong> The same 8-week test that protected the strong champion blocked most real gains for the weak one: accepting every proposal would have cut error by 6–7%. An adaptive rule, with a longer window or a sequential test, is the next step.</li>
+        <li><strong>A good model is hard to beat, and blind automation makes it worse.</strong> Picking the best of a dozen options on past data mostly picks the luckiest one.</li>
+        <li><strong>The AI's edge is judgement:</strong> knowing when to leave a model alone, and what to try when it's weak. It used about half the tests of the other methods.</li>
+        <li><strong>The safety rule needs to adapt.</strong> It protected a good model but held back real gains for a weak one. A rule that waits for more evidence would fix that.</li>
+        <li><strong>It cost nothing to run.</strong> The AI runs on an existing Claude plan, with no extra bill.</li>
       </ul>
-      <h2>How it works</h2>
+
+      <h2>For the technical reader</h2>
       <ol class="steps">
-        <li><strong>Tools as a command-line interface</strong> (<code>python -m steward ...</code>): status, data summary, champion report, diagnose, backtest, tune, promote, submit. Each result goes into a ledger with an id.</li>
-        <li><strong>Four "brains" use the same tools, budget and rule:</strong> never retrain, a scripted playbook, Optuna over the whole config space, and the AI agent: Claude Code running headless with written instructions.</li>
-        <li><strong>Replay:</strong> each Friday from January 2024 to August 2026 is replayed from the same starting champion. The agent works in a sandbox whose data stops at the cutoff, so it can't see the future.</li>
-        <li><strong>Scoring:</strong> each week's chosen model is deployed at the cutoff and scored on the following 12 weeks, which no tool could see.</li>
-        <li><strong>Cost:</strong> $0. The agent runs on an existing Claude plan, without an API bill.</li>
+        <li><strong>Tools:</strong> a command-line interface (<code>python -m steward ...</code>) for status, data summary, champion report, diagnose, backtest, tune, promote and submit. Every result goes into a ledger with an id.</li>
+        <li><strong>Guardrails:</strong> a fixed config space (4 model families, 6 feature groups, training windows, refit frequency, EWMA half-life), a weekly budget of 15 backtests, 2 tunes and 1 promotion test, and memo checks (numbers must match the ledger).</li>
+        <li><strong>Promotion rule:</strong> on the hidden 8 weeks, at least 1% lower MAE, a one-sided Diebold–Mariano p-value below 0.10, and a 5% margin-at-risk band breached on 2–9% of days.</li>
+        <li><strong>Reviewers:</strong> never retrain, a scripted playbook, Optuna over the whole config space, and Claude Code running headless with written instructions, in a sandbox whose data stops at the cutoff.</li>
+        <li><strong>Evaluation:</strong> each Friday from January 2024 to August 2026 replayed from the same starting champion; the chosen model is scored on the following 12 weeks. The AI ran on 16 weeks sampled from calm, normal and volatile markets.</li>
       </ol>
-      <p>The model, data and simulated business come from <a href="fx-margin.html">Project 3</a>, installed as a package. Full details are in the <a href="https://github.com/marlondocouto2/ai-model-steward">README</a>.</p>
+      <p>The model and data come from <a href="fx-margin.html">Project 3</a>, installed as a package. Full details are in the <a href="https://github.com/marlondocouto2/ai-model-steward">README</a>.</p>
     </section>
   </main>
 

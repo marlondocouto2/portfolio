@@ -6,8 +6,8 @@
   <title>Marlon Do Couto · Data science portfolio</title>
   <meta name="description" content="Data science projects by Marlon Do Couto, built from scratch on synthetic and public data, with interactive results. Current focus: forecasting.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17">
-  <script src="assets/common.js?v=2026-11-17"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-25g">
+  <script src="assets/common.js?v=2026-11-25g"></script>
 </head>
 <body>
   <header class="site-header">
@@ -16,11 +16,11 @@
       <nav class="nav" aria-label="Main">
         <a href="./" aria-current="page">Home</a>
         <a href="about.html">About</a>
-        <a href="weekday-seasonal.html">Weekday</a>
-        <a href="cash-flow.html">Cash-flow</a>
-        <a href="fx-margin.html">FX margin</a>
+        <a href="weekday-seasonal.html">Daily forecast</a>
+        <a href="cash-flow.html">Unusual days</a>
+        <a href="fx-margin.html">Currency risk</a>
         <a href="fx-pricing.html">Pricing test</a>
-        <a href="ai-steward.html">AI steward</a>
+        <a href="ai-steward.html">AI reviewer</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -32,10 +32,9 @@
       <h1>Models you can explain, measured in dollars</h1>
       <!-- Edit this paragraph to introduce yourself. -->
       <p class="lead">
-        Data science projects built from scratch on synthetic and public data, starting with a series
-        on treasury forecasting.
-        Every project starts simple, adds one fix at a time, and measures what each step is worth
-        with a walk-forward backtest and a dollar metric.
+        I build forecasting and decision models for payments companies, and explain them in plain
+        terms. Each project starts with the simplest model that works, improves it one step at a time,
+        and shows what each step is worth in dollars.
       </p>
       <div class="links">
         <a class="button primary" href="ai-steward.html">See the latest project</a>
@@ -46,49 +45,49 @@
     <h2>Projects</h2>
     <div class="cards">
       <a class="card" href="weekday-seasonal.html">
-        <span class="tag">Project 1 · Seasonal baseline</span>
-        <h3>Weekday-seasonal forecaster</h3>
-        <p>Daily payment volume, 1–30 days ahead, with one explainable formula: recent level × weekday effect × payday effect.</p>
-        <div class="metric">−35% error<small>vs repeating last week · buffer $15.8M vs $26.5M a day</small></div>
+        <span class="tag">Project 1 · Forecasting</span>
+        <h3>Daily payment forecast</h3>
+        <p>Predicts how much money a payments company needs each day, using the day of the week and paydays.</p>
+        <div class="metric">35% more accurate<small>than copying last week · $10.7M less cash on hand a day</small></div>
       </a>
       <a class="card" href="cash-flow.html">
-        <span class="tag">Project 2 · Spikes and holidays</span>
-        <h3>Cash-flow forecaster</h3>
-        <p>Builds on Project 1 in five steps: spike detection, holiday effects and Fourier seasonality with Prophet, across three corridors.</p>
-        <div class="metric">−38% error<small>vs the Project 1 baseline · $10.5M less cash held a day</small></div>
+        <span class="tag">Project 2 · Forecasting</span>
+        <h3>Handling unusual days</h3>
+        <p>Improves Project 1 for the days that break it: random spikes, payroll days and holidays.</p>
+        <div class="metric">38% more accurate<small>than Project 1 · $10.5M less cash on hand a day</small></div>
       </a>
       <a class="card" href="fx-margin.html">
-        <span class="tag">Project 3 · Margin at risk</span>
-        <h3>FX margin forecaster</h3>
-        <p>Real FX rates, two stages: an EWMA trend, then XGBoost and LightGBM on what the trend misses, with a calibrated 5% margin-at-risk band.</p>
-        <div class="metric">83% of predictable error<small>captured by stage 2 · risk band breached on 5.6% of days</small></div>
+        <span class="tag">Project 3 · Risk</span>
+        <h3>Currency profit and risk</h3>
+        <p>Predicts the profit on each currency transfer, using real exchange rates, and how bad a bad day can get.</p>
+        <div class="metric">94% of days<small>inside the predicted risk range, as designed</small></div>
       </a>
       <a class="card" href="fx-pricing.html">
-        <span class="tag">Project 4 · Experimentation</span>
-        <h3>FX pricing experiment</h3>
-        <p>An A/B test of raising a corridor's FX markup, from sample size to the launch decision: CUPED, sequential testing, segments, a fitted demand curve, plus switchbacks and diff-in-diff for treasury.</p>
-        <div class="metric">+16% profit<small>with tiered pricing vs +11% for one price · daily peeking: 27% false positives</small></div>
+        <span class="tag">Project 4 · Experiments</span>
+        <h3>Pricing experiment</h3>
+        <p>Tests whether raising the exchange fee earns more without driving customers away.</p>
+        <div class="metric">+16% profit<small>with separate prices for small and large senders, vs +11% with one price</small></div>
       </a>
       <a class="card" href="ai-steward.html">
-        <span class="tag">Project 5 · AI agent</span>
-        <h3>AI model steward</h3>
-        <p>An AI agent reviews the Project 3 model every week: it diagnoses, backtests, tunes and recommends keep or switch, within guardrails it can't change. Compared with plain automation on replayed weeks.</p>
-        <div class="metric">−2.34% error<small>from a weak champion vs −1.60% (scripted) and −1.48% (Optuna) · about half the backtests · $0 to run</small></div>
+        <span class="tag">Project 5 · AI</span>
+        <h3>AI model reviewer</h3>
+        <p>An AI checks a forecasting model every week and recommends keeping or replacing it, under safety rules it can't break.</p>
+        <div class="metric">Best of 4 methods<small>at improving a weak model, with half the work · an early result</small></div>
       </a>
     </div>
 
     <h2>How each project is built</h2>
     <ol class="steps">
-      <li><strong>Simulate data with known structure</strong>, so each model component can be checked against the truth, and run the same pipeline on public U.S. Treasury data.</li>
-      <li><strong>Start from a simple, explainable model</strong> and compare it with naive baselines.</li>
-      <li><strong>Add one fix at a time</strong>, each aimed at a specific kind of day the previous version gets wrong.</li>
-      <li><strong>Measure with a walk-forward backtest</strong>: refit at every origin, never use data from the future, and report errors by type of day.</li>
-      <li><strong>Translate into dollars</strong>: the cash buffer needed to cover shortfalls, and the cost of idle cash.</li>
+      <li><strong>Start with data where I know the right answer</strong>, so I can check the model got it right. Then repeat on real data.</li>
+      <li><strong>Start with the simplest model</strong>, and compare it with obvious shortcuts like "same as last week".</li>
+      <li><strong>Improve one thing at a time</strong>, so it's clear what each step adds.</li>
+      <li><strong>Test on past data as if it were live</strong>: the model only ever sees data up to the day it forecasts.</li>
+      <li><strong>Show the result in dollars</strong>, like how much less cash a company needs to keep on hand.</li>
     </ol>
   </main>
 
   <footer class="site-footer">
-    <div class="wrap">All data on this site is simulated unless marked as U.S. Treasury data. Code for every project is on <a href="https://github.com/marlondocouto2">GitHub</a>.</div>
+    <div class="wrap">Most data here is simulated, so the right answer is known; real data is labelled on each page. Code for every project is on <a href="https://github.com/marlondocouto2">GitHub</a>.</div>
   </footer>
 </body>
 </html>
