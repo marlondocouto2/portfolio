@@ -6,8 +6,8 @@
   <title>Marlon Do Couto · Data science portfolio</title>
   <meta name="description" content="Data science projects by Marlon Do Couto, built from scratch on synthetic and public data, with interactive results. Current focus: forecasting.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-26f">
-  <script src="assets/common.js?v=2026-11-26f"></script>
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-26g">
+  <script src="assets/common.js?v=2026-11-26g"></script>
 </head>
 <body>
   <header class="site-header">
@@ -21,7 +21,7 @@
         <a href="fx-margin.html">Currency risk</a>
         <a href="fx-pricing.html">Pricing test</a>
         <a href="ai-steward.html">AI reviewer</a>
-        <a href="./#foundations">Foundations</a>
+        <a href="foundations.html">Foundations</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
     </div>
@@ -75,6 +75,20 @@
         <p>An AI checks a forecasting model every week and recommends keeping or replacing it, under safety rules it can't break.</p>
         <div class="metric">Best of 4 methods<small>at improving a weak model, with half the work · an early result</small></div>
       </a>
+      <a class="card" href="foundations.html">
+        <span class="tag">Foundations · Core ML concepts</span>
+        <h3>Machine learning foundations</h3>
+        <p>Short projects on core machine learning concepts, applied to real public data outside finance.</p>
+        <figure class="mini-chart" aria-label="First project: typical Airbnb price in Rio falls from about R$590 next to an ocean beach to about R$250 20 km away">
+          <svg viewBox="0 0 260 64" preserveAspectRatio="none" aria-hidden="true">
+            <line class="base" x1="6" y1="61" x2="254" y2="61"/>
+            <polyline points="16.0,9.6 65.4,22.1 96.5,21.7 119.4,26.7 134.6,30.3 150.6,28.7 165.7,40.3 181.7,45.5 196.8,46.8 212.8,49.1 240.5,55.3"/>
+            <circle cx="16.0" cy="9.6" r="3"/><circle cx="240.5" cy="55.3" r="3"/>
+          </svg>
+          <figcaption><span>R$590 at the beach</span><span>R$250 20 km away</span></figcaption>
+        </figure>
+        <div class="metric">−5% per km<small>Airbnb prices in Rio, from an ocean beach · the first project</small></div>
+      </a>
     </div>
 
     <h2>How each project is built</h2>
@@ -85,17 +99,6 @@
       <li><strong>Test on past data as if it were live</strong>: the model only ever sees data up to the day it forecasts.</li>
       <li><strong>Show the result in dollars</strong>, like how much less cash a company needs to keep on hand.</li>
     </ol>
-
-    <h2 id="foundations">Foundations</h2>
-    <p class="lead" style="margin-top:0">Short projects on core machine learning concepts, applied to real public data outside finance.</p>
-    <div class="cards">
-      <a class="card" href="rio-airbnb.html">
-        <span class="tag">Foundations 01 · Regression and classification</span>
-        <h3>Airbnb prices in Rio</h3>
-        <p>What makes an Airbnb in Rio de Janeiro expensive, and can you tell hosts who run it as a business from people renting their own place?</p>
-        <div class="metric">−5% per km<small>from an ocean beach · the bay beaches add nothing</small></div>
-      </a>
-    </div>
   </main>
 
   <footer class="site-footer">
