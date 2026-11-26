@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Airbnb prices in Rio · Marlon Do Couto</title>
+  <meta name="description" content="A machine learning recap project: what drives Airbnb prices in Rio de Janeiro, and can you spot hosts who run it as a business? Linear and logistic regression on real data.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-26f">
+  <script src="assets/common.js?v=2026-11-26f"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+  <script defer src="assets/rio.js?v=2026-11-26f"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Marlon Do Couto</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="about.html">About</a>
+        <a href="weekday-seasonal.html">Daily forecast</a>
+        <a href="cash-flow.html">Unusual days</a>
+        <a href="fx-margin.html">Currency risk</a>
+        <a href="fx-pricing.html">Pricing test</a>
+        <a href="ai-steward.html">AI reviewer</a>
+        <a href="./#foundations" aria-current="page">Foundations</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <noscript><p class="noscript">The charts on this page need JavaScript.</p></noscript>
+    <section class="hero">
+      <div class="eyebrow">Foundations 01 · Regression and classification</div>
+      <h1>Airbnb prices in Rio</h1>
+      <p class="lead"><strong>The problem:</strong> what makes an Airbnb in Rio de Janeiro expensive? And can you tell hosts who run it as a business from people renting out their own place?</p>
+      <p class="lead"><strong>The result:</strong> using 43,192 real listings, my price model explains 54% of what makes prices differ, well ahead of simple lookups (36%). Being near the ocean matters most. Business hosts turned out to be hard to spot from the listing alone, an honest finding in itself.</p>
+      <div class="links">
+        <a class="button" href="https://github.com/marlondocouto2/ml-foundations/tree/main/01-rio-airbnb">Code on GitHub</a>
+        <a class="button" href="https://github.com/marlondocouto2/ml-foundations/blob/main/01-rio-airbnb/notebooks/walkthrough.ipynb">Notebook</a>
+      </div>
+    </section>
+
+    <div class="kpis">
+      <div class="kpi"><div class="value">54% vs 36%</div><div class="label">of price differences explained, model vs the best simple lookup (on listings it never saw)</div></div>
+      <div class="kpi"><div class="value">−5% per km</div><div class="label">on the nightly price, for each km further from an ocean beach</div></div>
+      <div class="kpi"><div class="value">+21%</div><div class="label">for a sea view, on top of the distance to the beach</div></div>
+      <div class="kpi"><div class="value">2 in 3</div><div class="label">"business" flags are right with a strict cut-off, but only 1 in 20 business hosts gets caught</div></div>
+    </div>
+
+    <section class="panel">
+      <h3>The ocean sets the price, not the bay</h3>
+      <p class="sub">The typical nightly price by distance to the nearest beach. Big dots mark three neighbourhoods. Hover for details.</p>
+      <div class="prose">
+        <p>Prices fall steadily the further you are from an ocean beach. Distance to a bay beach, like Botafogo's or Flamengo's, shows no pattern. So why is Botafogo pricier than Tijuca? Because it's about 2 km from Copacabana, and its prices sit close to the ocean curve.</p>
+      </div>
+      <div class="grid-2">
+        <div><p class="chart-cap">Nearest ocean beach</p><div id="beachOcean" class="chart short" role="img" aria-label="Typical price falls with distance to the nearest ocean beach"></div></div>
+        <div><p class="chart-cap">Nearest bay beach</p><div id="beachBay" class="chart short" role="img" aria-label="Typical price shows no pattern with distance to the nearest bay beach"></div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Learning, one step at a time</h3>
+      <p class="sub">A model that uses bedrooms only, learned step by step (gradient descent).</p>
+      <div class="prose">
+        <p>The model learns by taking small steps that reduce its error. The step size (the "learning rate") matters. Too small and it crawls; too large and it overshoots, and never gets close. Just right, it finds the best answer in a few passes: a base price of about R$290 a night for a studio, and about <strong>+44% for each extra bedroom</strong>.</p>
+      </div>
+      <div class="grid-2">
+        <div><p class="chart-cap">Price by bedrooms, and the model's line</p><div id="gdFit" class="chart short" role="img" aria-label="Price rises about 44% per bedroom"></div></div>
+        <div><p class="chart-cap">How fast it learns, by step size</p><div id="gdCost" class="chart short" role="img" aria-label="The error falls fast with a good step size, slowly with a small one, and bounces with a large one"></div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Why the inputs need the same scale</h3>
+      <p class="sub">The same learning method on all the features, with and without putting them on the same scale first.</p>
+      <div class="prose">
+        <p>Bedrooms run from 0 to 10, but the number of reviews goes up to 800. Without rescaling, a step size that suits one input is far too big for another, so the model overshoots and ends up further and further from the answer (orange). A smaller step is stable but slow (grey). Rescaled, it gets there in two passes (green).</p>
+      </div>
+      <div id="scaling" class="chart" role="img" aria-label="With scaled inputs the error reaches the minimum in two passes; raw inputs either bounce away or improve slowly"></div>
+    </section>
+
+    <section class="panel">
+      <h3>When a model learns too much</h3>
+      <p class="sub">How much of the price differences each model explains, on the listings it learned from and on new ones.</p>
+      <div class="prose">
+        <p>A more flexible model always fits the listings it learned from better (blue). On new listings (orange), a little flexibility helps, but too much makes it memorise quirks, and it falls apart. A penalty on complexity ("regularization") brings it back. Too strong a penalty makes it too simple again, so the right amount is chosen on listings set aside for that purpose.</p>
+      </div>
+      <div class="grid-2">
+        <div><p class="chart-cap">Letting the model bend more</p><div id="degrees" class="chart short" role="img" aria-label="Training accuracy keeps rising with flexibility while accuracy on new listings collapses"></div></div>
+        <div><p class="chart-cap">Reining it back in (regularization)</p><div id="ridge" class="chart short" role="img" aria-label="Regularization restores accuracy on new listings, until it is too strong"></div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Business host or not?</h3>
+      <p class="sub">A second model estimates the chance that a listing belongs to a host with 3 or more listings.</p>
+      <div class="prose">
+        <p>The model gives each listing a probability of belonging to a business host. I decided a false alarm, calling someone who rents their own flat a business, is the worse mistake, so the cut-off is set high. That makes flags more often right, but catches far fewer businesses. The second chart shows why: the model gives the two groups very similar scores, because from the listing alone they look alike. Only the few listings to the right of the cut-off get flagged.</p>
+      </div>
+      <div class="grid-2">
+        <div><p class="chart-cap">Choosing the cut-off</p><div id="cutoff" class="chart short" role="img" aria-label="Flags get more often right and catch fewer businesses as the cut-off rises"></div></div>
+        <div><p class="chart-cap">How the model scores each group</p><div id="boundary" class="chart short" role="img" aria-label="The model gives regular and business hosts heavily overlapping scores; few of either pass the cut-off"></div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Final test: predicted vs actual prices</h3>
+      <p class="sub">The price model on listings kept aside until the very end and used once. Each dot is a listing (left) or a neighbourhood (right); dots on the dashed line are predicted exactly.</p>
+      <div class="prose">
+        <p>About <strong>two thirds of listings are predicted within ±50%</strong> of their actual price. The big misses are mostly places priced well above what the data can see: photos, decor and how the host sets prices. Grouped by neighbourhood, the typical prediction lands close to the typical price, from Centro to Leblon.</p>
+      </div>
+      <div class="grid-2">
+        <div><p class="chart-cap">Each listing (2,500 of 6,346 shown)</p><div id="testListings" class="chart" role="img" aria-label="Predicted vs actual price for each test listing, clustered around the diagonal"></div></div>
+        <div><p class="chart-cap">Typical price by neighbourhood</p><div id="testHoods" class="chart" role="img" aria-label="Predicted vs actual typical price by neighbourhood, close to the diagonal"></div></div>
+      </div>
+    </section>
+
+    <section class="prose">
+      <h2>Takeaways</h2>
+      <ul>
+        <li><strong>Start with simple guesses.</strong> A lookup by size beat a lookup by neighbourhood, and every model has to beat both.</li>
+        <li><strong>An effect depends on what else is in the model.</strong> An extra bedroom adds 44% on its own, but about 16% once guests and bathrooms are included, because they overlap.</li>
+        <li><strong>More flexible isn't more accurate.</strong> Check on data the model hasn't seen, and use regularization to hold it back.</li>
+        <li><strong>A classifier gives you a trade-off, not an answer.</strong> Picking the cut-off means picking which mistake costs more.</li>
+      </ul>
+
+      <h2>For the technical reader</h2>
+      <ol class="steps">
+        <li><strong>Targets:</strong> log nightly price (regression); host has 3+ listings (classification). Host listing counts are never features.</li>
+        <li><strong>Features:</strong> distances to the nearest ocean beach, bay beach and metro station (OpenStreetMap), neighbourhood, sea view, beachfront, room type, size, rating, reviews, years listed, and booking behaviour for the classifier.</li>
+        <li><strong>Split:</strong> 70/15/15, grouped by host so no host is on both sides; the test set is used once.</li>
+        <li><strong>Models (scikit-learn):</strong> <code>SGDRegressor</code> for gradient descent and learning rates, <code>StandardScaler</code>, <code>PolynomialFeatures</code> (degrees 1–4), <code>Ridge</code> with its strength chosen on validation, and <code>LogisticRegression</code> with a 0.7 cut-off.</li>
+        <li><strong>Test set:</strong> price R² 0.54, typical miss 45%, 66% within ±50% (lookup baseline R² 0.36). Business host AUC 0.64; at 0.7, precision 67% and recall 5%.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Data: <a href="https://insideairbnb.com/">Inside Airbnb</a>, Rio de Janeiro, 22 September 2026 (CC BY 4.0); beaches and metro stations © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL). <a href="./">Back to all projects</a></div>
+  </footer>
+</body>
+</html>

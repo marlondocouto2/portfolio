@@ -73,6 +73,20 @@
     "Scripted playbook": "orange",
     "Optuna automation": "blue",
     "AI agent": "violet",
+    "Ocean beach": "blue",
+    "Bay beach": "aqua",
+    "too small": "gray",
+    "about right": "aqua",
+    "too large": "orange",
+    "Training listings": "blue",
+    "New listings": "orange",
+    Precision: "violet",
+    Recall: "yellow",
+    "Regular host": "yellow",
+    "Business host": "violet",
+    "Entire home/apt": "blue",
+    "Private room": "orange",
+    Neighbourhood: "violet",
   };
   function color(model) {
     const hue = HUES[MODEL_HUE[model]] || ["#8a8984", "#8f8e86"];
@@ -209,7 +223,7 @@
 
   // Bump ASSET_VERSION (and the ?v= on each page's <script>/<link> tags) whenever the site changes,
   // so browsers fetch the new files instead of mixing cached old ones with new ones.
-  const ASSET_VERSION = "2026-11-25g";
+  const ASSET_VERSION = "2026-11-26f";
 
   async function loadJSON(path) {
     const res = await fetch(`${path}?v=${ASSET_VERSION}`);
