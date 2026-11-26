@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Foundations · Marlon Do Couto</title>
+  <meta name="description" content="Short projects on core machine learning concepts (regression, classification, overfitting and more), applied to real public data outside finance.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><polyline points='5,22 11,15 16,19 22,9 27,13' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-26g">
+  <script src="assets/common.js?v=2026-11-26g"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">Marlon Do Couto</a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="about.html">About</a>
+        <a href="weekday-seasonal.html">Daily forecast</a>
+        <a href="cash-flow.html">Unusual days</a>
+        <a href="fx-margin.html">Currency risk</a>
+        <a href="fx-pricing.html">Pricing test</a>
+        <a href="ai-steward.html">AI reviewer</a>
+        <a href="foundations.html" aria-current="page">Foundations</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch theme">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Foundations</div>
+      <h1>Machine learning foundations</h1>
+      <p class="lead">Short projects on core machine learning concepts, applied to real public data outside finance.</p>
+      <p class="lead">Each one takes a few core ideas, such as regression, classification or overfitting, and uses them to answer a real question, in a single notebook with scikit-learn. They are smaller than the main projects, and built the same careful way.</p>
+      <div class="links">
+        <a class="button" href="https://github.com/marlondocouto2/ml-foundations">Code on GitHub</a>
+      </div>
+    </section>
+
+    <h2>Projects</h2>
+    <div class="cards">
+      <a class="card" href="rio-airbnb.html">
+        <span class="tag">Foundations 01 · Regression and classification</span>
+        <h3>Airbnb prices in Rio</h3>
+        <p>What makes an Airbnb in Rio de Janeiro expensive, and can you tell hosts who run it as a business from people renting their own place?</p>
+        <figure class="mini-chart" aria-label="Typical nightly price falls from about R$590 next to an ocean beach to about R$250 20 km away">
+          <svg viewBox="0 0 260 64" preserveAspectRatio="none" aria-hidden="true">
+            <line class="base" x1="6" y1="61" x2="254" y2="61"/>
+            <polyline points="16.0,9.6 65.4,22.1 96.5,21.7 119.4,26.7 134.6,30.3 150.6,28.7 165.7,40.3 181.7,45.5 196.8,46.8 212.8,49.1 240.5,55.3"/>
+            <circle cx="16.0" cy="9.6" r="3"/><circle cx="240.5" cy="55.3" r="3"/>
+          </svg>
+          <figcaption><span>R$590 at the beach</span><span>R$250 20 km away</span></figcaption>
+        </figure>
+        <div class="metric">−5% per km<small>from an ocean beach · the bay beaches add nothing</small></div>
+      </a>
+      <div class="card muted">
+        <span class="tag">Foundations 02</span>
+        <h3>Coming next</h3>
+        <p>More projects as I cover new topics, each on a different kind of public data.</p>
+      </div>
+    </div>
+
+    <h2>How each one is built</h2>
+    <ol class="steps">
+      <li><strong>Real public data, outside finance</strong>, to try the ideas on something new.</li>
+      <li><strong>A decision at each step</strong>, written down first: what to predict, which features, which mistake costs more.</li>
+      <li><strong>Simple guesses to beat</strong>, like the typical price of similar listings, before any model.</li>
+      <li><strong>A test set used once</strong>, at the very end, so the final score is honest.</li>
+      <li><strong>Tests for what could go wrong</strong>, like data from the same host leaking between training and testing.</li>
+    </ol>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Code and notebooks are on <a href="https://github.com/marlondocouto2/ml-foundations">GitHub</a>. <a href="./">Back to all projects</a></div>
+  </footer>
+</body>
+</html>
