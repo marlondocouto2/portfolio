@@ -300,6 +300,14 @@ def export_steward(repo: Path) -> dict:
     }
 
 
+def export_rio(repo: Path) -> dict:
+    """Foundations 01: Airbnb prices in Rio (the lesson writes its chart data to reports/charts.json)."""
+    charts = json.loads((repo / "reports" / "charts.json").read_text())
+    results = json.loads((repo / "reports" / "results.json").read_text())
+    return {"title": "Airbnb prices in Rio", "repo": "https://github.com/marlondocouto2/ml-foundations",
+            "test": results["test"], **charts}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -313,6 +321,7 @@ def main() -> None:
         "fxmargin.json": export_fx(args.projects_dir / "fx-margin-forecaster"),
         "pricing.json": export_pricing(args.projects_dir / "fx-pricing-experiment"),
         "steward.json": export_steward(args.projects_dir / "ai-model-steward"),
+        "rio.json": export_rio(args.projects_dir / "ml-foundations" / "01-rio-airbnb"),
     }
     for name, data in exports.items():
         path = OUT / name

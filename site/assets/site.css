@@ -228,5 +228,4 @@ table.text td, table.text th { white-space: normal; text-align: left; vertical-a
 table.text td:first-child { white-space: nowrap; }
 
 /* Foundations pages: static charts from the notebook (drawn on white, so they read in both themes) */
-.chart-img { margin: 12px 0 0; }
-.chart-img img { width: 100%; height: auto; display: block; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
+.chart-cap { font-weight: 600; font-size: 0.9rem; color: var(--ink); margin: 8px 0 2px; }
